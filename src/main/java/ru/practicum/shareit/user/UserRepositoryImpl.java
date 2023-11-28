@@ -1,30 +1,36 @@
 package ru.practicum.shareit.user;
 
-import java.util.List;
+import java.util.*;
 
 public class UserRepositoryImpl implements UserRepository {
+    private long userId = 0L;
+    private Set<String> emailContainer = new HashSet<>();
+    private Map<Long, User> userMap = new HashMap<>();
     @Override
-    public User createUser(User user) {
-        return null;
+    public UserDto createUser(UserDto userDto) {
+        User user = UserMapper.toUser(userDto);
+        user.setId(userId++);
+        userMap.put(user.getId(), user);
+        emailContainer.add(user.getEmail());
+        return UserMapper.toUserDto(user);
     }
 
     @Override
     public void removeUser(long userId) {
-
     }
 
     @Override
-    public User getUserById(long userId) {
+    public UserDto getUserById(long userId) {
         return null;
     }
 
     @Override
-    public List<User> getAllUsers() {
+    public List<UserDto> getAllUsers() {
         return null;
     }
 
     @Override
-    public User userUpdate(long userId, User user) {
+    public UserDto userUpdate(long userId, UserDto userDto) {
         return null;
     }
 }

@@ -3,13 +3,13 @@ package ru.practicum.shareit.user;
 import java.util.List;
 
 public interface UserRepository {
-    User createUser(User user);
+    UserDto createUser(UserDto userDto);
 
     void removeUser(long userId);
 
-    User getUserById(long userId);
+    UserDto getUserById(long userId);
 
-    List<User> getAllUsers();
+    List<UserDto> getAllUsers();
 
-    User userUpdate(long userId, User user);
+    UserDto userUpdate(long userId, UserDto userDto);
 }
