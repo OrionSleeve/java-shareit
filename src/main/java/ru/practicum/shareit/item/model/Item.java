@@ -2,20 +2,24 @@ package ru.practicum.shareit.item.model;
 
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
 
-/**
- * TODO Sprint add-controllers.
- */
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 @Data
 @Builder
 public class Item {
     private long id;
+    @NotBlank
     private String name;
+    @NotBlank
     private String description;
-    private Status available;
+    @NotNull
+    private Boolean available;
+    @NotNull
     private User owner;
     private ItemRequest request;
 }
