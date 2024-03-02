@@ -3,7 +3,7 @@ package ru.practicum.shareit.user.userService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.storage.UserRepository;
+import ru.practicum.shareit.user.userRepository.UserRepository;
 
 import java.util.List;
 
