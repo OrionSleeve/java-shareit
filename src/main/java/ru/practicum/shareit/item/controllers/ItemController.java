@@ -1,13 +1,13 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.itemService.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Slf4j
@@ -17,10 +17,11 @@ import java.util.List;
 @RequestMapping("/items")
 public class ItemController {
     private final ItemService itemService;
+    private static final String HEADER = "X-Sharer-User-Id";
 
     @PostMapping
-    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") long ownerId,
-                              @NotNull @RequestBody @Valid ItemDto itemDto) {
+    public ItemDto createItem(@RequestHeader(HEADER) long ownerId,
+                              @RequestBody @Valid ItemDto itemDto) {
         log.info("Creating item with owner ID {}", ownerId);
         return itemService.createItem(ownerId, itemDto);
     }
@@ -32,14 +33,14 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getItemByOwner(@RequestHeader("X-Sharer-User-Id") long ownerId) {
+    public List<ItemDto> getItemByOwner(@RequestHeader(HEADER) long ownerId) {
         log.info("Fetching items by owner ID {}", ownerId);
         return itemService.getItemsByOwner(ownerId);
     }
 
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(@PathVariable long itemId,
-                              @RequestHeader("X-Sharer-User-Id") long ownerId,
+                              @RequestHeader(HEADER) long ownerId,
                               @RequestBody ItemDto itemDto) {
         log.info("Updating item with ID {} by owner ID {}", itemId, ownerId);
         return itemService.updateItemData(itemId, ownerId, itemDto);

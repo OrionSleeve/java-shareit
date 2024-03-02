@@ -1,13 +1,18 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.storage;
 
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserMapper;
+import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Repository
+@Component
 public class UserRepositoryImpl implements UserRepository {
     private long userId = 0L;
     private final Set<String> emailData = new HashSet<>();
@@ -33,9 +38,12 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public UserDto getUserById(long userId) {
-        return Optional.ofNullable(userData.get(userId))
-                .map(UserMapper::toUserDto)
-                .orElseThrow(() -> new NotFoundException("User not found with userId: " + userId));
+        User user = userData.get(userId);
+        if (user != null) {
+            return UserMapper.toUserDto(user);
+        } else {
+            throw new NotFoundException("User not found with userId: " + userId);
+        }
     }
 
     @Override
@@ -47,21 +55,17 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public UserDto updateUserData(long userId, UserDto userDto) {
-        try {
-            User userUpdate = UserMapper.toUser(getUserById(userId));
-            updateFields(userUpdate, userDto);
-            userData.put(userUpdate.getId(), userUpdate);
-        } catch (NotFoundException e) {
-            throw new NotFoundException("User with id + userId + not found.");
-        }
+        User userUpdate = UserMapper.toUser(getUserById(userId));
+        updateFields(userUpdate, userDto);
+        userData.put(userUpdate.getId(), userUpdate);
         return getUserById(userId);
     }
 
     private void updateFields(User user, UserDto userDto) {
-        if (userDto.getName() != null) {
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
             user.setName(userDto.getName());
         }
-        if (userDto.getEmail() != null) {
+        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
             if (!user.getEmail().equals(userDto.getEmail())) {
                 validateEmail(userDto.getEmail());
             }

@@ -1,28 +1,29 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.repository;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserMapper;
-import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.user.dto.UserMapper;
+import ru.practicum.shareit.user.userService.UserService;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Repository
+@Component
 @RequiredArgsConstructor
 public class ItemRepositoryImpl implements ItemRepository {
     private final Map<Long, Item> itemMap = new HashMap<>();
     private final Map<Long, Map<Long, Item>> userItemMap = new HashMap<>();
     private long id = 0L;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public ItemDto createItem(long ownerId, ItemDto itemDto) {
         Item item = ItemMapper.toItem(itemDto);
-        item.setOwner(UserMapper.toUser(userRepository.getUserById(ownerId)));
+        item.setOwner(UserMapper.toUser(userService.getUserById(ownerId)));
         item.setId(++id);
         Map<Long, Item> userItems = userItemMap.getOrDefault(ownerId, new HashMap<>());
         userItems.put(item.getId(), item);
@@ -41,15 +42,13 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public List<ItemDto> getItemsByOwner(long ownerId) {
-        Map<Long, Item> userItems = userItemMap.get(ownerId);
-        if (userItems == null || userItems.isEmpty()) {
-            return Collections.emptyList();
-        }
+        Map<Long, Item> userItems = userItemMap.getOrDefault(ownerId, Collections.emptyMap());
         List<ItemDto> itemsByOwner = userItems
                 .values()
                 .stream()
                 .filter(Item::getAvailable)
-                .map(ItemMapper::toItemDto).collect(Collectors.toList());
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList());
 
         return itemsByOwner;
     }
@@ -68,27 +67,23 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public ItemDto updateItemData(long itemId, long ownerId, ItemDto itemDto) {
-        try {
-            Item thisItem = itemMap.get(itemId);
-            if (thisItem == null) {
-                throw new NotFoundException("Item with ID " + itemId + " not found.");
-            }
-            if (thisItem.getOwner().getId() != ownerId) {
-                throw new NotFoundException("Item with ID " + itemId + " does not belong to owner with ID " + ownerId);
-            }
-            itemFieldsUpdate(thisItem, itemDto);
-            itemMap.put(thisItem.getId(), thisItem);
-            userItemMap.get(ownerId).put(itemId, thisItem);
-        } catch (NotFoundException e) {
-            throw new NotFoundException("Failed to update item.");
+        Item thisItem;
+        thisItem = itemMap.get(itemId);
+        if (thisItem == null) {
+            throw new NotFoundException("Item with ID " + itemId + " not found.");
         }
-        return ItemMapper.toItemDto(itemMap.get(itemId));
+        if (thisItem.getOwner().getId() != ownerId) {
+            throw new NotFoundException("Item with ID " + itemId + " does not belong to owner with ID " + ownerId);
+        }
+        itemFieldsUpdate(thisItem, itemDto);
+        userItemMap.get(ownerId).put(itemId, thisItem);
+        return ItemMapper.toItemDto(thisItem);
     }
 
     @Override
     public List<ItemDto> searchItems(String text) {
         if (text.isBlank()) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         String searchTextLowerCase = text.toLowerCase();
@@ -112,21 +107,25 @@ public class ItemRepositoryImpl implements ItemRepository {
             throw new NotFoundException("Item with ID " + itemId + " not found in itemMap.");
         }
 
-        Map<Long, Item> userItems = userItemMap.get(itemDto.getOwnerId());
+        Map<Long, Item> userItems = userItemMap.get(itemId);
         if (userItems != null) {
             if (userItems.remove(itemId) == null) {
                 throw new NotFoundException("Item with ID " + itemId + " not found in userItemMap.");
             }
         } else {
-            throw new NotFoundException("User items not found for owner with ID " + itemDto.getOwnerId());
+            throw new NotFoundException("User items not found for owner with ID " + itemId);
         }
     }
 
     private void itemFieldsUpdate(Item item, ItemDto itemDto) {
-        if (itemDto.getName() != null && !Objects.equals(itemDto.getName(), item.getName())) {
+        if (itemDto.getName() != null
+                && !itemDto.getName().isBlank()
+                && !Objects.equals(itemDto.getName(), item.getName())) {
             item.setName(itemDto.getName());
         }
-        if (itemDto.getDescription() != null && !Objects.equals(itemDto.getDescription(), item.getDescription())) {
+        if (itemDto.getDescription() != null
+                && !itemDto.getDescription().isBlank()
+                && !Objects.equals(itemDto.getDescription(), item.getDescription())) {
             item.setDescription(itemDto.getDescription());
         }
         if (itemDto.getAvailable() != null && !Objects.equals(itemDto.getAvailable(), item.getAvailable())) {

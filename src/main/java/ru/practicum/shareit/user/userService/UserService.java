@@ -1,10 +1,9 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.userService;
 
-import org.springframework.stereotype.Service;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
 
-@Service
 public interface UserService {
     UserDto addNewUser(UserDto userDto);
 

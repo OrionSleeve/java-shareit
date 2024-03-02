@@ -1,4 +1,6 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.storage;
+
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
 

@@ -1,12 +1,13 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.GroupsInterface;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.userService.UserService;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Slf4j
@@ -18,7 +19,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public UserDto createUser(@NotNull @RequestBody @Valid UserDto userDto) {
+    public UserDto createUser(@RequestBody @Validated(GroupsInterface.Create.class) UserDto userDto) {
         log.info("Received request to create user: {}", userDto);
         return userService.addNewUser(userDto);
     }
