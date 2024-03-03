@@ -11,23 +11,23 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class ErrorHandlers {
-    @ExceptionHandler
+    @ExceptionHandler({MethodArgumentNotValidException.class, ValidationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse validationError(final ValidationException e) {
+    public ErrorResponse handleValidationExceptions(RuntimeException e) {
         log.error("Validation Error: {}", e.getMessage(), e);
-        return new ErrorResponse(String.format("valid error: %s", e.getMessage()));
+        return new ErrorResponse("validation error: " + e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(ConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse conflictError(final ConflictException e) {
+    public ErrorResponse conflictError(ConflictException e) {
         log.error("Conflict Error: {}", e.getMessage(), e);
         return new ErrorResponse(String.format("conflict error: %s", e.getMessage()));
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse notFoundError(final NotFoundException e) {
+    public ErrorResponse notFoundError(NotFoundException e) {
         log.error("Not Found Error: {}", e.getMessage(), e);
         return new ErrorResponse(String.format("not found: %s", e.getMessage()));
     }
@@ -36,12 +36,5 @@ public class ErrorHandlers {
     public ResponseEntity<ErrorResponse> handleThrowable(Throwable ex) {
         ErrorResponse errorResponse = new ErrorResponse("internal server error: " + ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationExceptions(MethodArgumentNotValidException ex) {
-        log.error("Validation Error: {}", ex.getMessage(), ex);
-        return new ErrorResponse("validation error: " + ex.getMessage());
     }
 }

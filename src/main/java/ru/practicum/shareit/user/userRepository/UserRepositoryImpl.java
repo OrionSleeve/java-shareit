@@ -1,29 +1,25 @@
 package ru.practicum.shareit.user.userRepository;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-@Component
+@Repository
 public class UserRepositoryImpl implements UserRepository {
     private long userId = 0L;
     private final Set<String> emailData = new HashSet<>();
     private final Map<Long, User> userData = new HashMap<>();
 
     @Override
-    public UserDto addNewUser(UserDto userDto) {
-        validateEmail(userDto.getEmail());
-        User user = UserMapper.toUser(userDto);
+    public User addNewUser(User user) {
+        validateEmail(user.getEmail());
         user.setId(generatedId());
         userData.put(user.getId(), user);
         emailData.add(user.getEmail());
-        return UserMapper.toUserDto(user);
+        return user;
     }
 
     @Override
@@ -35,41 +31,38 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public UserDto getUserById(long userId) {
+    public User getUserById(long userId) {
         User user = userData.get(userId);
         if (user != null) {
-            return UserMapper.toUserDto(user);
+            return user;
         } else {
             throw new NotFoundException("User not found with userId: " + userId);
         }
     }
 
     @Override
-    public List<UserDto> getAllUsers() {
-        return new ArrayList<>(userData.values()).stream()
-                .map(UserMapper::toUserDto)
-                .collect(Collectors.toList());
+    public List<User> getAllUsers() {
+        return new ArrayList<>(userData.values());
     }
 
     @Override
-    public UserDto updateUserData(long userId, UserDto userDto) {
-        User userUpdate = UserMapper.toUser(getUserById(userId));
-        updateFields(userUpdate, userDto);
-        userData.put(userUpdate.getId(), userUpdate);
-        return getUserById(userId);
+    public User updateUserData(long userId, User user) {
+        User existingUser = getUserById(userId);
+        updateFields(existingUser, user);
+        return existingUser;
     }
 
-    private void updateFields(User user, UserDto userDto) {
-        if (userDto.getName() != null && !userDto.getName().isBlank()) {
-            user.setName(userDto.getName());
+    private void updateFields(User existingUser, User newUser) {
+        if (newUser.getName() != null && !newUser.getName().isBlank()) {
+            existingUser.setName(newUser.getName());
         }
-        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
-            if (!user.getEmail().equals(userDto.getEmail())) {
-                validateEmail(userDto.getEmail());
+        if (newUser.getEmail() != null && !newUser.getEmail().isBlank()) {
+            if (!existingUser.getEmail().equals(newUser.getEmail())) {
+                validateEmail(newUser.getEmail());
             }
-            emailData.remove(user.getEmail());
-            user.setEmail(userDto.getEmail());
-            emailData.add(user.getEmail());
+            emailData.remove(existingUser.getEmail());
+            existingUser.setEmail(newUser.getEmail());
+            emailData.add(existingUser.getEmail());
         }
     }
 

@@ -37,7 +37,8 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public UserDto updateUser(@PathVariable long userId, @RequestBody UserDto userDto) {
+    public UserDto updateUser(@PathVariable long userId,
+                              @RequestBody @Validated(GroupsInterface.Update.class) UserDto userDto) {
         log.info("Received request to update user with ID: {} with data: {}", userId, userDto);
         return userService.updateUserData(userId, userDto);
     }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.Constants;
 import ru.practicum.shareit.item.itemService.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
 
@@ -17,7 +18,7 @@ import java.util.List;
 @RequestMapping("/items")
 public class ItemController {
     private final ItemService itemService;
-    private static final String HEADER = "X-Sharer-User-Id";
+    private static final String HEADER = Constants.HEADER;
 
     @PostMapping
     public ItemDto createItem(@RequestHeader(HEADER) long ownerId,
