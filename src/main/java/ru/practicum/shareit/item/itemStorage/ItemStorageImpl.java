@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.itemRepository;
+package ru.practicum.shareit.item.itemStorage;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
-public class ItemRepositoryImpl implements ItemRepository {
+public class ItemStorageImpl implements ItemStorage {
     private final Map<Long, Item> itemMap = new HashMap<>();
     private final Map<Long, Map<Long, Item>> userItemMap = new HashMap<>();
     private long id = 0L;
@@ -60,7 +60,7 @@ public class ItemRepositoryImpl implements ItemRepository {
             throw new NotFoundException("Item with ID " + itemId + " does not belong to owner with ID " + ownerId);
         }
         itemFieldsUpdate(thisItem, item);
-        userItemMap.get(ownerId).put(itemId, thisItem);
+        //userItemMap.get(ownerId);
         return thisItem;
     }
 

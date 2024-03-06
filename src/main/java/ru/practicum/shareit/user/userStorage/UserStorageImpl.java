@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user.userRepository;
+package ru.practicum.shareit.user.userStorage;
 
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.ConflictException;
@@ -8,7 +8,7 @@ import ru.practicum.shareit.user.model.User;
 import java.util.*;
 
 @Repository
-public class UserRepositoryImpl implements UserRepository {
+public class UserStorageImpl implements UserStorage {
     private long userId = 0L;
     private final Set<String> emailData = new HashSet<>();
     private final Map<Long, User> userData = new HashMap<>();

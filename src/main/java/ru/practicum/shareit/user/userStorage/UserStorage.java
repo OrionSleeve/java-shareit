@@ -1,10 +1,10 @@
-package ru.practicum.shareit.user.userRepository;
+package ru.practicum.shareit.user.userStorage;
 
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
-public interface UserRepository {
+public interface UserStorage {
     User addNewUser(User user);
 
     void removeUser(long userId);
