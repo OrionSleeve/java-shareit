@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.booking.model.enums.Status;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -21,9 +23,9 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column(name = "start_date", nullable = false)
-    private LocalDate start;
+    private LocalDateTime start;
     @Column(name = "end_date", nullable = false)
-    private LocalDate end;
+    private LocalDateTime end;
     @ManyToOne
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
