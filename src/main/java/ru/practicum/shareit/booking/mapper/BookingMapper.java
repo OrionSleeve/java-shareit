@@ -1,38 +1,50 @@
 package ru.practicum.shareit.booking.mapper;
 
 import lombok.experimental.UtilityClass;
-import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingDtoReq;
 import ru.practicum.shareit.booking.dto.BookingDtoResp;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.item.dto.ItemMapper;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.dto.UserMapper;
+import ru.practicum.shareit.user.model.User;
 
-import java.awt.print.Book;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @UtilityClass
 public class BookingMapper {
-    public static BookingDto toBookingDto(Booking booking) {
-        return BookingDto.builder()
-                .id(booking.getId())
-                .start(booking.getStart())
-                .end(booking.getEnd())
-                .status(booking.getStatus())
-                .itemId(booking.getItem().getId())
-                .bookerId(booking.getBooker().getId())
-                .build();
-    }
 
-    public static Booking toBooking(BookingDto bookingDto) {
-        return Booking.builder()
-                .id(bookingDto.getId())
-                .start(bookingDto.getStart())
-                .end(bookingDto.getEnd())
-                .status(bookingDto.getStatus())
-                .build();
-    }
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
-    public static BookingDtoResp toBookingDtoResp(Booking booking) {
+    public static BookingDtoResp toBookingDto(Booking booking) {
+        String startDate = DATE_TIME_FORMATTER.format(booking.getStart());
+        String endDate = DATE_TIME_FORMATTER.format(booking.getEnd());
+
         return BookingDtoResp.builder()
                 .id(booking.getId())
-                .status(booking.getStatus())
+                .status(String.valueOf(booking.getStatus()))
+                .start(startDate)
+                .end(endDate)
+                .booker(Optional.ofNullable(booking.getBooker()).map(UserMapper::toUserDto).orElse(null))
+                .item(ItemMapper.toItemDto(booking.getItem()))
                 .build();
+    }
+
+    public static List<BookingDtoResp> toBookingDto(List<Booking> bookings) {
+        return bookings.stream()
+                .map(BookingMapper::toBookingDto)
+                .collect(Collectors.toList());
+    }
+
+    public static Booking fromBookingDtoRequest(BookingDtoReq dto, User booker, Item item) {
+        Booking booking = new Booking();
+        booking.setItem(item);
+        booking.setBooker(booker);
+        booking.setStart(dto.getStart());
+        booking.setEnd(dto.getEnd());
+        return booking;
     }
 }

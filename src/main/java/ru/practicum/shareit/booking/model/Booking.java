@@ -9,7 +9,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
@@ -22,15 +22,15 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(name = "start_date", nullable = false)
+    @Column(name = "start_date")
+    @NotNull
     private LocalDateTime start;
-    @Column(name = "end_date", nullable = false)
+    @Column(name = "end_date")
+    @NotNull
     private LocalDateTime end;
-    @ManyToOne
-    @JoinColumn(name = "item_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Item item;
-    @ManyToOne
-    @JoinColumn(name = "booker_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     private User booker;
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
