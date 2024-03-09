@@ -14,7 +14,6 @@ CREATE TABLE items (
     description VARCHAR(512) NOT NULL,
     is_available BOOLEAN DEFAULT NULL,
     owner_id BIGINT NOT NULL,
-    request_id BIGINT,
     CONSTRAINT pk_item PRIMARY KEY (id),
     CONSTRAINT fk_items_to_users FOREIGN KEY(owner_id) REFERENCES users(id) ON DELETE CASCADE
 );
