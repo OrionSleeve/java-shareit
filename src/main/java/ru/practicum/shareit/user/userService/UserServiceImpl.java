@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
     private static final String USER_NOT_FOUND_MESSAGE = "User with id %s not found";
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public UserDto addNewUser(UserDto userDto) {
         User user = userRepository.save(UserMapper.toUser(userDto));
         return UserMapper.toUserDto(user);
