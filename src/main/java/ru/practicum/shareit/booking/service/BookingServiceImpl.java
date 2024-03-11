@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.bookingRepository.BookingRepository;
@@ -26,6 +27,7 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
+    private static final Sort SORT_START_DESC = Sort.by(Sort.Direction.DESC, "start");
 
     @Override
     @Transactional
@@ -83,13 +85,13 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(userId);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findAllByBookerIdCurrent(userId);
+                bookings = bookingRepository.findAllByBookerIdCurrent(userId, SORT_START_DESC);
                 break;
             case PAST:
-                bookings = bookingRepository.findAllByBookerIdPast(userId);
+                bookings = bookingRepository.findAllByBookerIdPast(userId, SORT_START_DESC);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findAllByBookerIdFuture(userId);
+                bookings = bookingRepository.findAllByBookerIdFuture(userId, SORT_START_DESC);
                 break;
             case WAITING:
                 bookings = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING);
@@ -114,13 +116,13 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(userId);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findAllByItemOwnerIdCurrentOrderByStartDesc(userId);
+                bookings = bookingRepository.findAllByItemOwnerIdCurrentOrderByStartDesc(userId, SORT_START_DESC);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findAllByItemOwnerIdFutureOrderByStartDesc(userId);
+                bookings = bookingRepository.findAllByItemOwnerIdFutureOrderByStartDesc(userId, SORT_START_DESC);
                 break;
             case PAST:
-                bookings = bookingRepository.findAllByItemOwnerIdPastOrderByStartDesc(userId);
+                bookings = bookingRepository.findAllByItemOwnerIdPastOrderByStartDesc(userId, SORT_START_DESC);
                 break;
             case WAITING:
                 bookings = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, Status.WAITING);

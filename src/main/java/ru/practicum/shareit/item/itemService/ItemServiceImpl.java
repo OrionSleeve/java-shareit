@@ -70,14 +70,16 @@ public class ItemServiceImpl implements ItemService {
         List<Long> itemIds = extractItemIds(items);
         List<ItemDto> itemDtoList = getItemsWithCommentsForItemIds(items, itemIds);
 
-        itemDtoList.forEach(i -> {
+        for (ItemDto i : itemDtoList) {
             List<BookingDto> nextBookingClosest = bookingRepository.findNextClosestBookingByOwnerId(ownerId, i.getId());
             List<BookingDto> lastBookingClosest = bookingRepository.findLastClosestBookingByOwnerId(ownerId, i.getId());
-
-            i.setNextBooking(nextBookingClosest.isEmpty() ? null : nextBookingClosest.get(0));
-            i.setLastBooking(lastBookingClosest.isEmpty() ? null : lastBookingClosest.get(0));
-        });
-
+            if (!nextBookingClosest.isEmpty()) {
+                i.setNextBooking(nextBookingClosest.get(0));
+            }
+            if (!lastBookingClosest.isEmpty()) {
+                i.setLastBooking(lastBookingClosest.get(0));
+            }
+        }
         return itemDtoList;
     }
 
@@ -112,9 +114,8 @@ public class ItemServiceImpl implements ItemService {
         User user = checkUser(bookerId);
         Item item = checkItem(itemId);
 
-        List<Booking> bookings = bookingRepository.findAllByBookerIdPast(bookerId);
-        Booking booking = bookings.stream()
-                .filter(b -> b.getItem().getId() == itemId)
+        Booking booking = bookingRepository.findAllByBookerIdAndItemIdPast(bookerId, itemId)
+                .stream()
                 .findFirst()
                 .orElseThrow(() -> new InvalidRequestException("Booking from user " + bookerId
                         + " for item " + itemId + " doesn't exist"));

@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.bookingRepository;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -16,42 +17,36 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking b " +
             "WHERE b.booker.id = :bookerId " +
             "AND b.start < CURRENT_TIMESTAMP " +
-            "AND b.end > CURRENT_TIMESTAMP " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllByBookerIdCurrent(long bookerId);
+            "AND b.end > CURRENT_TIMESTAMP ")
+    List<Booking> findAllByBookerIdCurrent(long bookerId, Sort sort);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.booker.id = :bookerId " +
-            "AND b.end < CURRENT_TIMESTAMP " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllByBookerIdPast(long bookerId);
+            "AND b.end < CURRENT_TIMESTAMP ")
+    List<Booking> findAllByBookerIdPast(long bookerId, Sort sort);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.booker.id = :bookerId " +
-            "AND b.start > CURRENT_TIMESTAMP " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllByBookerIdFuture(long bookerId);
+            "AND b.start > CURRENT_TIMESTAMP ")
+    List<Booking> findAllByBookerIdFuture(long bookerId, Sort sort);
 
     List<Booking> findAllByItemOwnerIdOrderByStartDesc(long userId);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.owner.id = :ownerId " +
             "AND b.start < CURRENT_TIMESTAMP " +
-            "AND b.end > CURRENT_TIMESTAMP " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllByItemOwnerIdCurrentOrderByStartDesc(long ownerId);
+            "AND b.end > CURRENT_TIMESTAMP ")
+    List<Booking> findAllByItemOwnerIdCurrentOrderByStartDesc(long ownerId, Sort sort);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.owner.id = :ownerId " +
-            "AND b.end < CURRENT_TIMESTAMP " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllByItemOwnerIdPastOrderByStartDesc(long ownerId);
+            "AND b.end < CURRENT_TIMESTAMP ")
+    List<Booking> findAllByItemOwnerIdPastOrderByStartDesc(long ownerId, Sort sort);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.owner.id = :ownerId " +
-            "AND b.start > CURRENT_TIMESTAMP " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllByItemOwnerIdFutureOrderByStartDesc(long ownerId);
+            "AND b.start > CURRENT_TIMESTAMP ")
+    List<Booking> findAllByItemOwnerIdFutureOrderByStartDesc(long ownerId, Sort sort);
 
     List<Booking> findAllByItemOwnerIdAndStatusOrderByStartDesc(long ownerId, Status status);
 
@@ -72,4 +67,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "AND b.start < CURRENT_TIMESTAMP " +
             "ORDER BY b.start DESC ")
     List<BookingDto> findLastClosestBookingByOwnerId(long ownerId, long itemId);
+
+    @Query("SELECT b FROM Booking b " +
+            "WHERE b.booker.id = :bookerId " +
+            "AND b.item.id = :itemId " +
+            "AND b.end < CURRENT_TIMESTAMP " +
+            "ORDER BY b.start DESC")
+    List<Booking> findAllByBookerIdAndItemIdPast(long bookerId, long itemId);
 }
