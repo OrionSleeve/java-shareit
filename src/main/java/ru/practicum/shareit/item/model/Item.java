@@ -1,12 +1,13 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.*;
-import org.hibernate.proxy.HibernateProxy;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.Objects;
 
 @Getter
 @Setter

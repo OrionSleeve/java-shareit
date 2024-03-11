@@ -9,7 +9,6 @@ import ru.practicum.shareit.booking.dto.BookingDtoResp;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 import static ru.practicum.shareit.Constants.HEADER;
@@ -53,7 +52,7 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDtoResp> getBookingsByUser(@RequestParam(defaultValue = "ALL")
-                                                      String state, @RequestHeader(HEADER) long userId) {
+                                                  String state, @RequestHeader(HEADER) long userId) {
         log.info("Received request to fetch bookings for user {} with state {}", userId, state);
         List<BookingDtoResp> response = bookingService.getBookingByBookerId(userId, state);
         log.info("Fetched bookings successfully for user {} with state {}", userId, state);

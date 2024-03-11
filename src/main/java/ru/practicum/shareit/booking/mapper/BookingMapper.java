@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class BookingMapper {
 
-    private final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     public BookingDtoResp toBookingDto(Booking booking) {
         String startDate = DATE_TIME_FORMATTER.format(booking.getStart());
