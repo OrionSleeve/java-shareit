@@ -24,7 +24,7 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping
-    public BookingDtoResp createBooking(@RequestBody @Valid @NotNull BookingDtoReq bookingDto,
+    public BookingDtoResp createBooking(@RequestBody @Valid BookingDtoReq bookingDto,
                                         @RequestHeader(HEADER) long userId) {
         log.info("Received request to create booking for user {}", userId);
         BookingDtoResp response = bookingService.addBooking(bookingDto, userId);
@@ -52,8 +52,8 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<BookingDtoResp> getBookingsByUser(@RequestParam(defaultValue = "ALL", required = false)
-                                                  String state, @RequestHeader(HEADER) long userId) {
+    public List<BookingDtoResp> getBookingsByUser(@RequestParam(defaultValue = "ALL")
+                                                      String state, @RequestHeader(HEADER) long userId) {
         log.info("Received request to fetch bookings for user {} with state {}", userId, state);
         List<BookingDtoResp> response = bookingService.getBookingByBookerId(userId, state);
         log.info("Fetched bookings successfully for user {} with state {}", userId, state);
@@ -61,7 +61,7 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public List<BookingDtoResp> getOwnerItemsBooking(@RequestParam(defaultValue = "ALL", required = false) String state,
+    public List<BookingDtoResp> getOwnerItemsBooking(@RequestParam(defaultValue = "ALL") String state,
                                                      @RequestHeader(HEADER) long userId) {
         log.info("Received request to fetch bookings for item owner {} with state {}", userId, state);
         List<BookingDtoResp> response = bookingService.getBookingByItemOwner(userId, state);

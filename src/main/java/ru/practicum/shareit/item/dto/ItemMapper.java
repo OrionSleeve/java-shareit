@@ -16,7 +16,7 @@ public class ItemMapper {
                 .build();
     }
 
-    public static Item toItem(ItemDto itemDto) {
+    public Item toItem(ItemDto itemDto) {
         User user = new User();
         user.setId(itemDto.getOwnerId() != null ? itemDto.getOwnerId() : null);
 

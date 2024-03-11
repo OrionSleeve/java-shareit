@@ -8,6 +8,7 @@ import ru.practicum.shareit.booking.dto.BookingDtoReq;
 import ru.practicum.shareit.booking.dto.BookingDtoResp;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.enums.BookingState;
 import ru.practicum.shareit.booking.model.enums.Status;
 import ru.practicum.shareit.exception.InvalidRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -73,25 +74,28 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDtoResp> getBookingByBookerId(long userId, String state) {
+    public List<BookingDtoResp> getBookingByBookerId(long userId, String stateString) {
         checkUser(userId);
+        BookingState state = BookingState.toState(stateString);
         List<Booking> bookings;
         switch (state) {
-            case "ALL":
+            case ALL:
                 bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(userId);
                 break;
-            case "CURRENT":
+            case CURRENT:
                 bookings = bookingRepository.findAllByBookerIdCurrent(userId);
                 break;
-            case "PAST":
+            case PAST:
                 bookings = bookingRepository.findAllByBookerIdPast(userId);
                 break;
-            case "FUTURE":
+            case FUTURE:
                 bookings = bookingRepository.findAllByBookerIdFuture(userId);
                 break;
-            case "WAITING":
-            case "REJECTED":
-                bookings = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.valueOf(state));
+            case WAITING:
+                bookings = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING);
+                break;
+            case REJECTED:
+                bookings = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED);
                 break;
             default:
                 throw new InvalidRequestException("Unknown state: " + state);
@@ -101,25 +105,28 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDtoResp> getBookingByItemOwner(long userId, String state) {
+    public List<BookingDtoResp> getBookingByItemOwner(long userId, String stateString) {
         checkUser(userId);
+        BookingState state = BookingState.toState(stateString);
         List<Booking> bookings;
         switch (state) {
-            case "ALL":
+            case ALL:
                 bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(userId);
                 break;
-            case "CURRENT":
+            case CURRENT:
                 bookings = bookingRepository.findAllByItemOwnerIdCurrentOrderByStartDesc(userId);
                 break;
-            case "FUTURE":
+            case FUTURE:
                 bookings = bookingRepository.findAllByItemOwnerIdFutureOrderByStartDesc(userId);
                 break;
-            case "PAST":
+            case PAST:
                 bookings = bookingRepository.findAllByItemOwnerIdPastOrderByStartDesc(userId);
                 break;
-            case "WAITING":
-            case "REJECTED":
-                bookings = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, Status.valueOf(state));
+            case WAITING:
+                bookings = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, Status.WAITING);
+                break;
+            case REJECTED:
+                bookings = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, Status.REJECTED);
                 break;
             default:
                 throw new InvalidRequestException("Unknown state: " + state);

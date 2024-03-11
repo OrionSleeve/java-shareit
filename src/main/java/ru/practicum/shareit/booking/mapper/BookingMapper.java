@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class BookingMapper {
 
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    private final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
-    public static BookingDtoResp toBookingDto(Booking booking) {
+    public BookingDtoResp toBookingDto(Booking booking) {
         String startDate = DATE_TIME_FORMATTER.format(booking.getStart());
         String endDate = DATE_TIME_FORMATTER.format(booking.getEnd());
 
@@ -33,13 +33,13 @@ public class BookingMapper {
                 .build();
     }
 
-    public static List<BookingDtoResp> toBookingDto(List<Booking> bookings) {
+    public List<BookingDtoResp> toBookingDto(List<Booking> bookings) {
         return bookings.stream()
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
 
-    public static Booking fromBookingDtoRequest(BookingDtoReq dto, User booker, Item item) {
+    public Booking fromBookingDtoRequest(BookingDtoReq dto, User booker, Item item) {
         Booking booking = new Booking();
         booking.setItem(item);
         booking.setBooker(booker);

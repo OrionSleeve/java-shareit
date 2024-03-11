@@ -66,7 +66,7 @@ public class ItemController {
     public CommentResDto addCommentToItem(
             @PathVariable long itemId,
             @RequestHeader(HEADER) long bookerId,
-            @RequestBody CommentReqDto commentRequestDto) {
+            @Valid @RequestBody CommentReqDto commentRequestDto) {
         log.info("Received request to create comment for item with ID {} from booker with ID {}", itemId, bookerId);
         return itemService.addComment(commentRequestDto, bookerId, itemId);
     }

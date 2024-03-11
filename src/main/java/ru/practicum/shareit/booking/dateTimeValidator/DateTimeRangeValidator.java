@@ -19,6 +19,6 @@ public class DateTimeRangeValidator implements ConstraintValidator<DateTimeRange
         LocalDateTime start = entity.getStart();
         LocalDateTime end = entity.getEnd();
 
-        return start != null && end != null && end.isAfter(start) && start.isAfter(now);
+        return start != null && end != null && end.isAfter(start) && !start.isBefore(now);
     }
 }
