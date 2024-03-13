@@ -34,7 +34,16 @@ public class ErrorHandlers {
 
     @ExceptionHandler(Throwable.class)
     public ResponseEntity<ErrorResponse> handleThrowable(Throwable ex) {
+        log.error("An unexpected error occurred: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse("internal server error: " + ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleStateException(final InvalidRequestException ex) {
+        log.error("An unexpected error occurred: {}", ex.getMessage(), ex);
+        return new ErrorResponse(ex.getMessage());
+    }
+
 }

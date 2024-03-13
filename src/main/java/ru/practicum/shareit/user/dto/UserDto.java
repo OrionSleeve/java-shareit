@@ -11,7 +11,6 @@ import javax.validation.constraints.NotEmpty;
 @Data
 @Builder
 public class UserDto {
-
     private long id;
     @NotBlank(groups = {GroupsInterface.Create.class})
     private String name;

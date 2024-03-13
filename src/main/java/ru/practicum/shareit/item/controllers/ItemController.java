@@ -4,12 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.Constants;
-import ru.practicum.shareit.item.itemService.ItemService;
+import ru.practicum.shareit.item.dto.CommentReqDto;
+import ru.practicum.shareit.item.dto.CommentResDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.itemService.ItemService;
 
 import javax.validation.Valid;
 import java.util.List;
+
+import static ru.practicum.shareit.Constants.HEADER;
 
 @Slf4j
 @Validated
@@ -18,7 +21,6 @@ import java.util.List;
 @RequestMapping("/items")
 public class ItemController {
     private final ItemService itemService;
-    private static final String HEADER = Constants.HEADER;
 
     @PostMapping
     public ItemDto createItem(@RequestHeader(HEADER) long ownerId,
@@ -28,9 +30,10 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable long itemId) {
+    public ItemDto getItemById(@PathVariable long itemId,
+                               @RequestHeader(HEADER) long ownerId) {
         log.info("Fetching item by ID {}", itemId);
-        return itemService.getItemById(itemId);
+        return itemService.getItemById(itemId, ownerId);
     }
 
     @GetMapping
@@ -57,5 +60,14 @@ public class ItemController {
     public void removeItem(@PathVariable long itemId) {
         log.info("Removing item with ID {}", itemId);
         itemService.removeItem(itemId);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentResDto addCommentToItem(
+            @PathVariable long itemId,
+            @RequestHeader(HEADER) long bookerId,
+            @Valid @RequestBody CommentReqDto commentRequestDto) {
+        log.info("Received request to create comment for item with ID {} from booker with ID {}", itemId, bookerId);
+        return itemService.addComment(commentRequestDto, bookerId, itemId);
     }
 }
