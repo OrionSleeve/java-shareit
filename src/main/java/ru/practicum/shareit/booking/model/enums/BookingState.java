@@ -12,7 +12,7 @@ public enum BookingState {
 
     public static BookingState toState(String state) {
         for (BookingState bookingState : values()) {
-            if (bookingState.name().equals(state)) {
+            if (bookingState.name().equalsIgnoreCase(state)) {
                 return bookingState;
             }
         }
