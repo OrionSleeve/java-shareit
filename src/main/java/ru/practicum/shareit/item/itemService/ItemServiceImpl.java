@@ -13,14 +13,14 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.pagination.Paginator;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +31,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final CommentRepository commentRepository;
     private final BookingRepository bookingRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
     @Transactional
@@ -38,6 +39,15 @@ public class ItemServiceImpl implements ItemService {
         User user = checkUser(ownerId);
         Item item = ItemMapper.toItem(itemDto);
         item.setOwner(user);
+        Long requestId = itemDto.getRequestId();
+        if (requestId != null) {
+            Optional<ItemRequest> itemRequest = itemRequestRepository.findById(requestId);
+            if (itemRequest.isEmpty()) {
+                throw new NotFoundException("Item request " + requestId + " not found");
+            }
+            ItemRequest request = itemRequest.get();
+            item.setRequest(request);
+        }
         itemRepository.save(item);
         return ItemMapper.toItemDto(item);
     }
@@ -65,8 +75,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> getItemsByOwner(long ownerId) {
-        List<Item> items = itemRepository.findAllByOwnerId(ownerId);
+    public List<ItemDto> getItemsByOwner(long ownerId, int from, int size) {
+        List<Item> items = itemRepository.findAllByOwnerId(ownerId, Paginator.createSimplePageRequest(from, size));
         List<Long> itemIds = extractItemIds(items);
         List<ItemDto> itemDtoList = getItemsWithCommentsForItemIds(items, itemIds);
 
@@ -97,14 +107,15 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> searchItems(String text) {
+    public List<ItemDto> searchItems(String text, int from, int size) {
         if (text.isEmpty()) return new ArrayList<>();
-        List<Item> items = itemRepository.searchItemByNameOrDescription(text);
+        List<Item> items = itemRepository.searchItemByNameOrDescription(text, Paginator.createSimplePageRequest(from, size));
         List<Long> itemIds = extractItemIds(items);
         return getItemsWithCommentsForItemIds(items, itemIds);
     }
 
     @Override
+    @Transactional
     public void removeItem(long itemId) {
         itemRepository.deleteById(itemId);
     }

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import ru.practicum.shareit.exception.InvalidRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.pagination.Paginator;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -76,28 +78,29 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDtoResp> getBookingByBookerId(long userId, String stateString) {
+    public List<BookingDtoResp> getBookingByBookerId(long userId, String stateString, int from, int size) {
+    Pageable page = Paginator.createPageRequestWithSort(from, size, SORT_START_DESC);
         checkUser(userId);
         BookingState state = BookingState.toState(stateString);
         List<Booking> bookings;
         switch (state) {
             case ALL:
-                bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(userId);
+                bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(userId, page);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findAllByBookerIdCurrent(userId, SORT_START_DESC);
+                bookings = bookingRepository.findAllByBookerIdCurrent(userId, page);
                 break;
             case PAST:
-                bookings = bookingRepository.findAllByBookerIdPast(userId, SORT_START_DESC);
+                bookings = bookingRepository.findAllByBookerIdPast(userId, page);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findAllByBookerIdFuture(userId, SORT_START_DESC);
+                bookings = bookingRepository.findAllByBookerIdFuture(userId, page);
                 break;
             case WAITING:
-                bookings = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING);
+                bookings = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING, page);
                 break;
             case REJECTED:
-                bookings = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED);
+                bookings = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED, page);
                 break;
             default:
                 throw new InvalidRequestException("Unknown state: " + state);
@@ -107,28 +110,29 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDtoResp> getBookingByItemOwner(long userId, String stateString) {
+    public List<BookingDtoResp> getBookingByItemOwner(long userId, String stateString, int from, int size) {
+        Pageable page = Paginator.createPageRequestWithSort(from, size, SORT_START_DESC);
         checkUser(userId);
         BookingState state = BookingState.toState(stateString);
         List<Booking> bookings;
         switch (state) {
             case ALL:
-                bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(userId);
+                bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(userId, page);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findAllByItemOwnerIdCurrentOrderByStartDesc(userId, SORT_START_DESC);
+                bookings = bookingRepository.findAllByItemOwnerIdCurrentOrderByStartDesc(userId, page);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findAllByItemOwnerIdFutureOrderByStartDesc(userId, SORT_START_DESC);
+                bookings = bookingRepository.findAllByItemOwnerIdFutureOrderByStartDesc(userId, page);
                 break;
             case PAST:
-                bookings = bookingRepository.findAllByItemOwnerIdPastOrderByStartDesc(userId, SORT_START_DESC);
+                bookings = bookingRepository.findAllByItemOwnerIdPastOrderByStartDesc(userId, page);
                 break;
             case WAITING:
-                bookings = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, Status.WAITING);
+                bookings = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, Status.WAITING, page);
                 break;
             case REJECTED:
-                bookings = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, Status.REJECTED);
+                bookings = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, Status.REJECTED, page);
                 break;
             default:
                 throw new InvalidRequestException("Unknown state: " + state);
