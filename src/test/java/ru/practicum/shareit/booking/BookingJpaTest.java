@@ -140,7 +140,7 @@ class BookingJpaTest {
     @SneakyThrows
     void findAllByItemOwnerIdOrderByStartDesc() {
         List<Booking> actual = bookingRepository
-                .findAllByItemOwnerIdOrderByStartDesc(ownerId, PAGE);
+                .findAllByItemOwnerId(ownerId, PAGE);
         List<Booking> expect = new ArrayList<>();
         expect.add(bookingRepository.findById(bookingId1).get());
         expect.add(bookingRepository.findById(bookingId2).get());
@@ -152,7 +152,7 @@ class BookingJpaTest {
     @SneakyThrows
     void findAllByItemOwnerIdCurrentOrderByStartDesc() {
         List<Booking> actual = bookingRepository
-                .findAllByItemOwnerIdCurrentOrderByStartDesc(ownerId, PAGE);
+                .findAllByItemOwnerIdCurrent(ownerId, PAGE);
         List<Booking> expect = Collections.emptyList();
         assertEquals(expect, actual);
     }
@@ -161,7 +161,7 @@ class BookingJpaTest {
     @SneakyThrows
     void findAllByItemOwnerIdPastOrderByStartDesc() {
         List<Booking> actual = bookingRepository
-                .findAllByItemOwnerIdPastOrderByStartDesc(ownerId, PAGE);
+                .findAllByItemOwnerIdPast(ownerId, PAGE);
         List<Booking> expect = Collections.emptyList();
         assertEquals(expect, actual);
     }
@@ -170,7 +170,7 @@ class BookingJpaTest {
     @SneakyThrows
     void findAllByItemOwnerIdFutureOrderByStartDesc() {
         List<Booking> actual = bookingRepository
-                .findAllByItemOwnerIdFutureOrderByStartDesc(ownerId, PAGE);
+                .findAllByItemOwnerIdFuture(ownerId, PAGE);
         List<Booking> expect = new ArrayList<>();
         expect.add(bookingRepository.findById(bookingId1).get());
         expect.add(bookingRepository.findById(bookingId2).get());

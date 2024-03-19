@@ -97,10 +97,10 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.findAllByBookerIdFuture(userId, page);
                 break;
             case WAITING:
-                bookings = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING, page);
+                bookings = bookingRepository.findAllByBookerIdAndStatus(userId, Status.WAITING, page);
                 break;
             case REJECTED:
-                bookings = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED, page);
+                bookings = bookingRepository.findAllByBookerIdAndStatus(userId, Status.REJECTED, page);
                 break;
             default:
                 throw new InvalidRequestException("Unknown state: " + state);
@@ -117,22 +117,22 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> bookings;
         switch (state) {
             case ALL:
-                bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(userId, page);
+                bookings = bookingRepository.findAllByItemOwnerId(userId, page);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findAllByItemOwnerIdCurrentOrderByStartDesc(userId, page);
+                bookings = bookingRepository.findAllByItemOwnerIdCurrent(userId, page);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findAllByItemOwnerIdFutureOrderByStartDesc(userId, page);
+                bookings = bookingRepository.findAllByItemOwnerIdFuture(userId, page);
                 break;
             case PAST:
-                bookings = bookingRepository.findAllByItemOwnerIdPastOrderByStartDesc(userId, page);
+                bookings = bookingRepository.findAllByItemOwnerIdPast(userId, page);
                 break;
             case WAITING:
-                bookings = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, Status.WAITING, page);
+                bookings = bookingRepository.findAllByItemOwnerIdAndStatus(userId, Status.WAITING, page);
                 break;
             case REJECTED:
-                bookings = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, Status.REJECTED, page);
+                bookings = bookingRepository.findAllByItemOwnerIdAndStatus(userId, Status.REJECTED, page);
                 break;
             default:
                 throw new InvalidRequestException("Unknown state: " + state);

@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.GroupsInterface;
 import ru.practicum.shareit.item.dto.CommentReqDto;
 import ru.practicum.shareit.item.dto.CommentResDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoCreate;
 import ru.practicum.shareit.item.itemService.ItemService;
 
 import javax.validation.Valid;
@@ -25,7 +27,7 @@ public class ItemController {
 
     @PostMapping
     public ItemDto createItem(@RequestHeader(HEADER) long ownerId,
-                              @RequestBody @Valid ItemDto itemDto) {
+                              @RequestBody @Validated(GroupsInterface.Create.class) ItemDtoCreate itemDto) {
         log.info("Creating item with owner ID {}", ownerId);
         return itemService.createItem(ownerId, itemDto);
     }
@@ -48,7 +50,7 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(@PathVariable long itemId,
                               @RequestHeader(HEADER) long ownerId,
-                              @RequestBody ItemDto itemDto) {
+                              @RequestBody @Valid ItemDtoCreate itemDto) {
         log.info("Updating item with ID {} by owner ID {}", itemId, ownerId);
         return itemService.updateItemData(itemId, ownerId, itemDto);
     }

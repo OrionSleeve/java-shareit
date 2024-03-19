@@ -34,6 +34,4 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "FROM Item AS i " +
             "WHERE i.request.id = :requestId")
     List<ItemForRequestDto> getItemDescriptionForRequest(long requestId);
-
-    boolean existsById(Long id);
 }

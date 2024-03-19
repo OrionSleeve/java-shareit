@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,16 +25,11 @@ public class ItemMapper {
                 .collect(Collectors.toList());
     }
 
-    public Item toItem(ItemDto itemDto) {
-        User user = new User();
-        user.setId(itemDto.getOwnerId() != null ? itemDto.getOwnerId() : null);
-
+    public Item toItem(ItemDtoCreate itemDto) {
         Item item = new Item();
-        item.setId(itemDto.getId());
         item.setName(itemDto.getName());
         item.setDescription(itemDto.getDescription());
         item.setAvailable(itemDto.getAvailable());
-        item.setOwner(user);
         return item;
     }
 }

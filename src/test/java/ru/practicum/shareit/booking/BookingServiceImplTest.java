@@ -258,7 +258,7 @@ class BookingServiceImplTest {
                 .thenReturn(Collections.emptyList());
         when(bookingRepository.findAllByBookerIdFuture(bookerId, page))
                 .thenReturn(Collections.emptyList());
-        when(bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(bookerId, Status.REJECTED, page))
+        when(bookingRepository.findAllByBookerIdAndStatus(bookerId, Status.REJECTED, page))
                 .thenReturn(List.of(booking3));
 
         List<BookingDtoResp> expectedList1 = BookingMapper.toBookingDto(List.of(booking1, booking2, booking3));
@@ -332,15 +332,15 @@ class BookingServiceImplTest {
         booking3.setStatus(Status.WAITING);
 
         when(userRepository.findById(ownerId)).thenReturn(Optional.of(owner));
-        when(bookingRepository.findAllByItemOwnerIdOrderByStartDesc(ownerId, page))
+        when(bookingRepository.findAllByItemOwnerId(ownerId, page))
                 .thenReturn(List.of(booking1, booking2, booking3));
-        when(bookingRepository.findAllByItemOwnerIdCurrentOrderByStartDesc(ownerId, page))
+        when(bookingRepository.findAllByItemOwnerIdCurrent(ownerId, page))
                 .thenReturn(List.of(booking1, booking2, booking3));
-        when(bookingRepository.findAllByItemOwnerIdPastOrderByStartDesc(ownerId, page))
+        when(bookingRepository.findAllByItemOwnerIdPast(ownerId, page))
                 .thenReturn(Collections.emptyList());
-        when(bookingRepository.findAllByItemOwnerIdFutureOrderByStartDesc(ownerId, page))
+        when(bookingRepository.findAllByItemOwnerIdFuture(ownerId, page))
                 .thenReturn(Collections.emptyList());
-        when(bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(ownerId, Status.REJECTED, page))
+        when(bookingRepository.findAllByItemOwnerIdAndStatus(ownerId, Status.REJECTED, page))
                 .thenReturn(List.of(booking3));
 
         List<BookingDtoResp> expectedList1 = BookingMapper.toBookingDto(List.of(booking1, booking2, booking3));

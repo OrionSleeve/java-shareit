@@ -31,5 +31,6 @@ public class Item {
     @ToString.Exclude
     private User owner;
     @ManyToOne(fetch = FetchType.LAZY)
+    @ToString.Exclude
     private ItemRequest request;
 }

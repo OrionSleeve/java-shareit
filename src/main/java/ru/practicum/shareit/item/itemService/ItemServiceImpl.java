@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.itemService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.bookingRepository.BookingRepository;
@@ -35,19 +36,14 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public ItemDto createItem(long ownerId, ItemDto itemDto) {
+    public ItemDto createItem(long ownerId, ItemDtoCreate itemDto) {
         User user = checkUser(ownerId);
         Item item = ItemMapper.toItem(itemDto);
         item.setOwner(user);
         Long requestId = itemDto.getRequestId();
-        if (requestId != null) {
-            Optional<ItemRequest> itemRequest = itemRequestRepository.findById(requestId);
-            if (itemRequest.isEmpty()) {
-                throw new NotFoundException("Item request " + requestId + " not found");
-            }
-            ItemRequest request = itemRequest.get();
-            item.setRequest(request);
-        }
+        ItemRequest request = requestId != null ? itemRequestRepository.findById(requestId)
+                .orElseThrow(() -> new NotFoundException("Item request " + requestId + " not found")) : null;
+        item.setRequest(request);
         itemRepository.save(item);
         return ItemMapper.toItemDto(item);
     }
@@ -95,7 +91,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public ItemDto updateItemData(long itemId, long ownerId, ItemDto itemDto) {
+    public ItemDto updateItemData(long itemId, long ownerId, ItemDtoCreate itemDto) {
         checkUser(ownerId);
         Item updatedItem = ItemMapper.toItem(itemDto);
         itemRepository.updateItemFields(updatedItem, ownerId, itemId);
@@ -108,7 +104,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public List<ItemDto> searchItems(String text, int from, int size) {
-        if (text.isEmpty()) return new ArrayList<>();
+        if (text.isBlank()) return Collections.emptyList();
         List<Item> items = itemRepository.searchItemByNameOrDescription(text, Paginator.createSimplePageRequest(from, size));
         List<Long> itemIds = extractItemIds(items);
         return getItemsWithCommentsForItemIds(items, itemIds);

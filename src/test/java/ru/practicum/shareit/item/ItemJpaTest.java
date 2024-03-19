@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoCreate;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -34,11 +34,11 @@ class ItemJpaTest {
         User owner = UserMapper.toUser(userDto);
         owner = userRepository.save(owner);
 
-        Item item1 = ItemMapper.toItem(ItemDto.builder()
+        Item item1 = ItemMapper.toItem(ItemDtoCreate.builder()
                 .name("Item1")
                 .description("Description1")
                 .available(true).build());
-        Item item2 = ItemMapper.toItem(ItemDto.builder()
+        Item item2 = ItemMapper.toItem(ItemDtoCreate.builder()
                 .name("Item2")
                 .description("Description2")
                 .available(true).build());
