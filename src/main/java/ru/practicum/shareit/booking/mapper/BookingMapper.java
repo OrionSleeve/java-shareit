@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.mapper;
 
 import lombok.experimental.UtilityClass;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoReq;
 import ru.practicum.shareit.booking.dto.BookingDtoResp;
 import ru.practicum.shareit.booking.model.Booking;
@@ -47,4 +48,14 @@ public class BookingMapper {
         booking.setEnd(dto.getEnd());
         return booking;
     }
+
+    public BookingDto maptoBookingDtoForOwner(Booking booking) {
+        if (booking == null) {
+            return null;
+        }
+
+        return new BookingDto(booking.getId(),
+                booking.getBooker().getId());
+    }
+
 }

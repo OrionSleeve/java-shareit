@@ -4,12 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.GroupsInterface;
 import ru.practicum.shareit.item.dto.CommentReqDto;
 import ru.practicum.shareit.item.dto.CommentResDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoCreate;
 import ru.practicum.shareit.item.itemService.ItemService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 import static ru.practicum.shareit.Constants.HEADER;
@@ -24,7 +27,7 @@ public class ItemController {
 
     @PostMapping
     public ItemDto createItem(@RequestHeader(HEADER) long ownerId,
-                              @RequestBody @Valid ItemDto itemDto) {
+                              @RequestBody @Validated(GroupsInterface.Create.class) ItemDtoCreate itemDto) {
         log.info("Creating item with owner ID {}", ownerId);
         return itemService.createItem(ownerId, itemDto);
     }
@@ -37,26 +40,30 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getItemByOwner(@RequestHeader(HEADER) long ownerId) {
+    public List<ItemDto> getItemByOwner(@RequestHeader(HEADER) long ownerId,
+                                        @RequestParam(name = "from", defaultValue = "0") @Min(0) int from,
+                                        @RequestParam(name = "size", defaultValue = "10") @Min(0) int size) {
         log.info("Fetching items by owner ID {}", ownerId);
-        return itemService.getItemsByOwner(ownerId);
+        return itemService.getItemsByOwner(ownerId, from, size);
     }
 
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(@PathVariable long itemId,
                               @RequestHeader(HEADER) long ownerId,
-                              @RequestBody ItemDto itemDto) {
+                              @Validated(GroupsInterface.Update.class) @RequestBody ItemDtoCreate itemDto) {
         log.info("Updating item with ID {} by owner ID {}", itemId, ownerId);
         return itemService.updateItemData(itemId, ownerId, itemDto);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItems(@RequestParam String text) {
+    public List<ItemDto> searchItems(@RequestParam String text,
+                                     @RequestParam(name = "from", defaultValue = "0") @Min(0) int from,
+                                     @RequestParam(name = "size", defaultValue = "10") @Min(0) int size) {
         log.info("Searching items with text: {}", text);
-        return itemService.searchItems(text.toLowerCase());
+        return itemService.searchItems(text.toLowerCase(), from, size);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{itemId}")
     public void removeItem(@PathVariable long itemId) {
         log.info("Removing item with ID {}", itemId);
         itemService.removeItem(itemId);

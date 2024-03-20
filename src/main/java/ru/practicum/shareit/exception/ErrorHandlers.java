@@ -18,13 +18,6 @@ public class ErrorHandlers {
         return new ErrorResponse("validation error: " + e.getMessage());
     }
 
-    @ExceptionHandler(ConflictException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse conflictError(ConflictException e) {
-        log.error("Conflict Error: {}", e.getMessage(), e);
-        return new ErrorResponse(String.format("conflict error: %s", e.getMessage()));
-    }
-
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse notFoundError(NotFoundException e) {
