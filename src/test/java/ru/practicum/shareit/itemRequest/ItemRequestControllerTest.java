@@ -5,7 +5,6 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,11 +20,11 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.Constants.HEADER;
 
-@SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ItemRequestControllerTest extends CrudTestUtils {
@@ -101,5 +100,18 @@ class ItemRequestControllerTest extends CrudTestUtils {
                 .getContentAsString(), ItemRequestDto.class);
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    @SneakyThrows
+    void createItemRequest_InvalidDescription() {
+        long userId = createUser(UserDto.builder().name("Mark").email("mark@email.com").build()).getId();
+        ItemDescriptionRequestDto itemRequestDescription = new ItemDescriptionRequestDto();
+
+        MvcResult result = mockMvc.perform(post("/requests")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HEADER, String.valueOf(userId))
+                        .content(objectMapper.writeValueAsString(itemRequestDescription)))
+                .andExpect(status().isBadRequest()).andDo(print()).andReturn();
     }
 }

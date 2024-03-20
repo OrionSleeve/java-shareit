@@ -5,7 +5,6 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -38,7 +37,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.Constants.HEADER;
 
-@SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ItemControllerTest extends CrudTestUtils {
@@ -120,9 +118,9 @@ class ItemControllerTest extends CrudTestUtils {
         fields.put("available", "false");
 
         mockMvc.perform(patch("/items/{itemId}", itemInvalidId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(fields))
-                .header(HEADER, String.valueOf(ownerId)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(fields))
+                        .header(HEADER, String.valueOf(ownerId)))
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof NotFoundException));
     }
 
@@ -138,8 +136,8 @@ class ItemControllerTest extends CrudTestUtils {
         fields.put("available", "false");
 
         mockMvc.perform(patch("/items/{itemId}", itemId).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(fields))
-                .header(HEADER, String.valueOf(ownerInvalidId)))
+                        .content(objectMapper.writeValueAsString(fields))
+                        .header(HEADER, String.valueOf(ownerInvalidId)))
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof NotFoundException));
     }
 
@@ -152,7 +150,7 @@ class ItemControllerTest extends CrudTestUtils {
         String text = "item";
 
         mockMvc.perform(get("/items/search")
-                .contentType(MediaType.APPLICATION_JSON).param("text", text))
+                        .contentType(MediaType.APPLICATION_JSON).param("text", text))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(2))).andReturn();
     }
@@ -166,7 +164,7 @@ class ItemControllerTest extends CrudTestUtils {
         String text = "";
 
         mockMvc.perform(get("/items/search")
-                .contentType(MediaType.APPLICATION_JSON).param("text", text))
+                        .contentType(MediaType.APPLICATION_JSON).param("text", text))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(0))).andReturn();
     }
@@ -177,11 +175,11 @@ class ItemControllerTest extends CrudTestUtils {
         long itemId = createItem(ItemDto.builder().name("Item1").description("Description1").available(true).build(), ownerId).getId();
 
         mockMvc.perform(delete("/items/{itemId}", itemId)
-                .contentType(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk())
+                        .contentType(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
         mockMvc.perform(get("/items")
-                .contentType(MediaType.APPLICATION_JSON).header(HEADER, String.valueOf(ownerId)))
+                        .contentType(MediaType.APPLICATION_JSON).header(HEADER, String.valueOf(ownerId)))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(0))).andReturn();
     }
@@ -209,9 +207,9 @@ class ItemControllerTest extends CrudTestUtils {
         commentRequestDto.setText("comment");
 
         MvcResult result = mockMvc.perform(post("/items/{itemId}/comment", itemId)
-                .contentType("application/json")
-                .header(HEADER, String.valueOf(bookerId))
-                .content(objectMapper.writeValueAsString(commentRequestDto)))
+                        .contentType("application/json")
+                        .header(HEADER, String.valueOf(bookerId))
+                        .content(objectMapper.writeValueAsString(commentRequestDto)))
                 .andExpect(status().isOk()).andDo(print()).andReturn();
 
         CommentResDto commentResponseDto = objectMapper.readValue(result.getResponse()
@@ -221,5 +219,32 @@ class ItemControllerTest extends CrudTestUtils {
         assertEquals(commentResponseDto.getText(), commentRequestDto.getText());
         assertEquals(commentResponseDto.getAuthorName(), booking.getBooker().getName());
     }
+
+    @Test
+    public void shouldReturnBadRequestWhenCreatingItemWithEmptyName() throws Exception {
+        long ownerId = createUser(UserDto.builder().name("Mark").email("mark@email.com").build()).getId();
+
+        ItemDto request = ItemDto.builder().description("Description").available(true).build();
+
+        mockMvc.perform(post("/items")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .header(HEADER, String.valueOf(ownerId)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldReturnBadRequestWhenCreatingItemWithEmptyDescription() throws Exception {
+        long ownerId = createUser(UserDto.builder().name("Mark").email("mark@email.com").build()).getId();
+
+        ItemDto request = ItemDto.builder().name("Item").available(true).build();
+
+        mockMvc.perform(post("/items")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .header(HEADER, String.valueOf(ownerId)))
+                .andExpect(status().isBadRequest());
+    }
+
 
 }

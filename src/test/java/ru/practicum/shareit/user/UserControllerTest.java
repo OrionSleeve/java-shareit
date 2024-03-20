@@ -5,7 +5,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,7 +23,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
 @AutoConfigureMockMvc
 class UserControllerTest extends CrudTestUtils {
 
@@ -154,4 +152,44 @@ class UserControllerTest extends CrudTestUtils {
         userService.getAllUsers().forEach(u -> userService.removeUser(u.getId()));
     }
 
+    @Test
+    public void shouldReturnBadRequestWhenNameIsNull() throws Exception {
+        UserDto newUser = UserDto.builder().email("test@example.com").build();
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newUser)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldReturnBadRequestWhenEmailIsNull() throws Exception {
+        UserDto newUser = UserDto.builder().name("Test").build();
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newUser)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldReturnBadRequestWhenEmailIsInvalid() throws Exception {
+        UserDto newUser = UserDto.builder().name("Test").email("invalid_email").build();
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newUser)))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    public void shouldReturnBadRequestWhenEmailIsTooLong() throws Exception {
+        UserDto newUser = UserDto.builder().name("Test").email("a".repeat(255) + "@example.com").build();
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newUser)))
+                .andExpect(status().isBadRequest());
+    }
 }

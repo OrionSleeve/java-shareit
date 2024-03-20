@@ -50,7 +50,7 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(@PathVariable long itemId,
                               @RequestHeader(HEADER) long ownerId,
-                              @RequestBody @Valid ItemDtoCreate itemDto) {
+                              @Validated(GroupsInterface.Update.class) @RequestBody ItemDtoCreate itemDto) {
         log.info("Updating item with ID {} by owner ID {}", itemId, ownerId);
         return itemService.updateItemData(itemId, ownerId, itemDto);
     }

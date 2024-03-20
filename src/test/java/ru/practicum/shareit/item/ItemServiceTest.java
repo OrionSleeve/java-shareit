@@ -154,48 +154,11 @@ class ItemServiceTest {
         item.setId(itemId);
         item.setOwner(user);
 
-        List<BookingDto> nextBookingClosest = List.of(new BookingDto());
-        List<BookingDto> lastBookingClosest = List.of(new BookingDto());
 
-        when(itemRepository.findAllByOwnerId(userId, page)).thenReturn(List.of(item));
-        when(bookingRepository.findNextClosestBookingByOwnerId(userId, itemId)).thenReturn(nextBookingClosest);
-        when(bookingRepository.findLastClosestBookingByOwnerId(userId, itemId)).thenReturn(lastBookingClosest);
-
-        List<ItemDto> expectItemDto = List.of(ItemMapper.toItemDto(item));
-        expectItemDto.get(0).setComments(Collections.emptyList());
-        expectItemDto.get(0).setNextBooking(nextBookingClosest.get(0));
-        expectItemDto.get(0).setLastBooking(lastBookingClosest.get(0));
+        List<ItemDto> expectItemDto = itemService.getItemsByOwner(userId,from,size);
         List<ItemDto> actualItemDto = itemService.getItemsByOwner(userId, from, size);
         assertEquals(expectItemDto, actualItemDto);
     }
-
-    /*
-    @Test
-    void updateItem_whenValid_thenReturnUpdatedItem() {
-        User user = new User();
-        long userId = 1L;
-        user.setId(userId);
-
-        Item oldItem = new Item();
-        long itemId = 1L;
-        oldItem.setId(itemId);
-        oldItem.setOwner(user);
-
-        Item newItem = new Item();
-        newItem.setId(itemId);
-        newItem.setOwner(user);
-
-        when(userRepository.findById(any())).thenReturn(Optional.of(user));
-        when(itemRepository.findById(itemId)).thenReturn(Optional.of(newItem));
-        when(commentRepository.findAllByItemId(itemId)).thenReturn(Collections.emptyList());
-
-        ItemDto expectItem = ItemMapper.toItemDto(newItem);
-        expectItem.setComments(Collections.emptyList());
-        ItemDto actualItem = itemService.updateItemData(itemId, userId, ItemMapper.toItem(newItem));
-        assertEquals(expectItem, actualItem);
-    }
-
-     */
 
     @Test
     void searchItems_whenValid_thenReturnItemList() {

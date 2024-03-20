@@ -21,7 +21,5 @@ public class ItemDtoCreate {
 
     @NotNull(groups = {GroupsInterface.Create.class})
     private Boolean available;
-
-    @NotNull(groups = {GroupsInterface.Update.class})
     private Long requestId;
 }

@@ -1,15 +1,12 @@
 package ru.practicum.shareit.booking.bookingRepository;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.enums.Status;
 
-import java.awt.print.Book;
-import java.util.Arrays;
 import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
@@ -77,4 +74,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "AND b.end < CURRENT_TIMESTAMP " +
             "ORDER BY b.start DESC")
     List<Booking> findAllByBookerIdAndItemIdPast(long bookerId, long itemId);
+
+    List<Booking> findAllByItem_Id(long itemId);
 }

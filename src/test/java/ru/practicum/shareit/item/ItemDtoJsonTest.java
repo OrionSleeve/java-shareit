@@ -78,37 +78,4 @@ public class ItemDtoJsonTest {
         assertNotNull(itemDto.getLastBooking());
         assertEquals(1, itemDto.getComments().size());
     }
-
-    /*
-    @Test
-    public void testValidation() {
-        ItemDto itemDto = ItemDto.builder()
-                .id(1L)
-                .name("")
-                .description(null)
-                .available(true)
-                .ownerId(100L)
-                .requestId(200L)
-                .nextBooking(new BookingDto())
-                .lastBooking(new BookingDto())
-                .comments(Collections.emptyList())
-                .build();
-
-        Set<ConstraintViolation<ItemDto>> violations = validator.validate(itemDto);
-        assertEquals(2, violations.size());
-
-        ConstraintViolation<ItemDto> nameViolation = violations.stream()
-                .filter(v -> v.getPropertyPath().toString().equals("name"))
-                .findFirst()
-                .orElse(null);
-        assertNotNull(nameViolation);
-
-        ConstraintViolation<ItemDto> descriptionViolation = violations.stream()
-                .filter(v -> v.getPropertyPath().toString().equals("description"))
-                .findFirst()
-                .orElse(null);
-        assertNotNull(descriptionViolation);
-    }
-
-     */
 }

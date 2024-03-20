@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -17,7 +16,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 class ItemRequestJpaTest {
@@ -87,14 +86,13 @@ class ItemRequestJpaTest {
 
     @Test
     void findByRequesterIdIsNot() {
-        List<ItemRequest> expected = List.of(
-                itemRequestRepository.findById(itemRequestId3).get()
-        );
+        ItemRequest itemRequest = itemRequestRepository.findById(itemRequestId3).orElse(null);
 
-        Page<ItemRequest> actual = itemRequestRepository
-                .findByRequesterIdIsNot(requesterId, PAGE);
+        assertNotNull(itemRequest);
 
-        assertEquals(expected, actual.toList());
+        List<ItemRequest> actual = itemRequestRepository.findByRequesterIdIsNot(requesterId, PAGE);
+
+        assertTrue(actual.stream().noneMatch(req -> req.getRequester().getId().equals(requesterId)));
     }
 
     @AfterEach

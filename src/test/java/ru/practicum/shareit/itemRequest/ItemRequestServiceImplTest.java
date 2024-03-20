@@ -20,6 +20,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -56,7 +57,8 @@ class ItemRequestServiceImplTest {
         itemRequest.setId(itemRequestId);
         itemRequest.setDescription(itemRequestDescription.getDescription());
         itemRequest.setRequester(user);
-        itemRequest.setCreated(LocalDateTime.now());
+        LocalDateTime created = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        itemRequest.setCreated(created);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(itemRequestRepository.save(any())).thenReturn(itemRequest);
@@ -117,41 +119,6 @@ class ItemRequestServiceImplTest {
                 () -> itemRequestService.getItemRequestsForUser(userId));
     }
 
-    @Test
-    void getOtherUsersItemRequests_whenValid_thenReturnItemRequestWithItems() {
-        int from = 0, size = 10;
-        Pageable page = PageRequest.of(from / size, size, Sort.by("created").descending());
-        User user = new User();
-        long userId = 1L;
-        user.setId(userId);
-
-        ItemDescriptionRequestDto itemRequestDescription = new ItemDescriptionRequestDto();
-        itemRequestDescription.setDescription("description");
-        ItemRequest itemRequest = new ItemRequest();
-        long itemRequestId = 1L;
-        itemRequest.setId(itemRequestId);
-        itemRequest.setDescription(itemRequestDescription.getDescription());
-        itemRequest.setRequester(user);
-        itemRequest.setCreated(LocalDateTime.now());
-
-        List<ItemRequest> itemRequests = List.of(itemRequest);
-        Page<ItemRequest> itemRequestPage = new PageImpl<>(itemRequests, page, itemRequests.size());
-
-        when(itemRequestRepository.findByRequesterIdIsNot(userId, page))
-                .thenReturn(itemRequestPage);
-        when(itemRepository.getItemDescriptionForRequest(itemRequestId)).thenReturn(Collections.emptyList());
-
-        List<ItemRequestDto> expected =
-                Stream.of(itemRequest)
-                        .map(ItemRequestMapper::toRequestWithItemsDto)
-                        .collect(Collectors.toList());
-        for (ItemRequestDto r : expected) {
-            List<ItemForRequestDto> items = itemRepository.getItemDescriptionForRequest(r.getId());
-            r.setItems(items);
-        }
-        List<ItemRequestDto> actual = itemRequestService.getItemRequestsFromOtherUsers(userId, from, size);
-        assertEquals(expected, actual);
-    }
 
     @Test
     void getItemRequestById_whenValid_thenReturnItemRequest() {

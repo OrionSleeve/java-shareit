@@ -48,36 +48,29 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public List<ItemRequestDto> getItemRequestsForUser(long userId) {
         checkUser(userId);
-        List<ItemRequestDto> requests = itemRequestRepository
-                .findAllByRequesterIdOrderByCreatedDesc(userId)
-                .stream()
+        List<ItemRequest> itemRequests = itemRequestRepository
+                .findAllByRequesterIdOrderByCreatedDesc(userId);
+
+        Map<Long, List<ItemForRequestDto>> itemsMap = getItemResponsesForRequests(itemRequests);
+
+        return itemRequests.stream()
                 .map(ItemRequestMapper::toRequestWithItemsDto)
+                .peek(r -> r.setItems(itemsMap.getOrDefault(r.getId(), Collections.emptyList())))
                 .collect(Collectors.toList());
-
-        Map<Long, List<ItemForRequestDto>> itemsMap = requests.stream()
-                .map(ItemRequestDto::getId)
-                .collect(Collectors.toMap(Function.identity(), this::getItemResponsesForRequest));
-
-        requests.forEach(r -> r.setItems(itemsMap.getOrDefault(r.getId(), Collections.emptyList())));
-
-        return requests;
     }
 
     @Override
     public List<ItemRequestDto> getItemRequestsFromOtherUsers(long userId, int from, int size) {
         Pageable page = PageRequest.of(from / size, size, Sort.by("created").descending());
-        List<ItemRequestDto> requests = itemRequestRepository
-                .findByRequesterIdIsNot(userId, page)
-                .stream()
+        List<ItemRequest> itemRequests = itemRequestRepository
+                .findByRequesterIdIsNot(userId, page);
+
+        Map<Long, List<ItemForRequestDto>> itemsMap = getItemResponsesForRequests(itemRequests);
+
+        return itemRequests.stream()
                 .map(ItemRequestMapper::toRequestWithItemsDto)
+                .peek(r -> r.setItems(itemsMap.getOrDefault(r.getId(), Collections.emptyList())))
                 .collect(Collectors.toList());
-
-        for (ItemRequestDto r : requests) {
-            List<ItemForRequestDto> items = getItemResponsesForRequest(r.getId());
-            r.setItems(items);
-        }
-
-        return requests;
     }
 
     @Override
@@ -109,5 +102,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private void checkItemRequest(long requestId) {
         userRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Item request not found" + requestId));
+    }
+
+    private Map<Long, List<ItemForRequestDto>> getItemResponsesForRequests(List<ItemRequest> itemRequests) {
+        return itemRequests.stream()
+                .map(ItemRequest::getId)
+                .collect(Collectors.toMap(Function.identity(), this::getItemResponsesForRequest));
     }
 }

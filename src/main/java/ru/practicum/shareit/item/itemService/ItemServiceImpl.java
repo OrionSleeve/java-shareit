@@ -1,12 +1,13 @@
 package ru.practicum.shareit.item.itemService;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.bookingRepository.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.enums.Status;
 import ru.practicum.shareit.exception.InvalidRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.*;
@@ -77,14 +78,10 @@ public class ItemServiceImpl implements ItemService {
         List<ItemDto> itemDtoList = getItemsWithCommentsForItemIds(items, itemIds);
 
         for (ItemDto i : itemDtoList) {
-            List<BookingDto> nextBookingClosest = bookingRepository.findNextClosestBookingByOwnerId(ownerId, i.getId());
-            List<BookingDto> lastBookingClosest = bookingRepository.findLastClosestBookingByOwnerId(ownerId, i.getId());
-            if (!nextBookingClosest.isEmpty()) {
-                i.setNextBooking(nextBookingClosest.get(0));
-            }
-            if (!lastBookingClosest.isEmpty()) {
-                i.setLastBooking(lastBookingClosest.get(0));
-            }
+            BookingDto nextBooking = BookingMapper.maptoBookingDtoForOwner(findNextBooking(i.getId()));
+            BookingDto lastBooking = BookingMapper.maptoBookingDtoForOwner(findLastBooking(i.getId()));
+            i.setNextBooking(nextBooking);
+            i.setLastBooking(lastBooking);
         }
         return itemDtoList;
     }
@@ -168,5 +165,25 @@ public class ItemServiceImpl implements ItemService {
             itemDtoList.add(dto);
         }
         return itemDtoList;
+    }
+
+    private Booking findLastBooking(long itemId) {
+        List<Booking> itemBookings = bookingRepository.findAllByItem_Id(itemId);
+
+        return itemBookings.stream()
+                .filter(booking -> booking.getStart().isBefore(LocalDateTime.now()))
+                .filter(booking -> booking.getStatus() == Status.APPROVED)
+                .max(Comparator.comparing(Booking::getEnd))
+                .orElse(null);
+    }
+
+    private Booking findNextBooking(long itemId) {
+        List<Booking> itemBookings = bookingRepository.findAllByItem_Id(itemId);
+
+        return itemBookings.stream()
+                .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
+                .filter(booking -> booking.getStatus() == Status.APPROVED)
+                .min(Comparator.comparing(Booking::getStart))
+                .orElse(null);
     }
 }

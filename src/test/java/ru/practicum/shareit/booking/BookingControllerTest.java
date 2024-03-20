@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -35,7 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.Constants.HEADER;
 
-@SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class BookingControllerTest extends CrudTestUtils {
@@ -562,5 +560,18 @@ class BookingControllerTest extends CrudTestUtils {
                         .param("size", String.valueOf(size))
                         .header(HEADER, String.valueOf(ownerId)))
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof InvalidRequestException));
+    }
+
+    @Test
+    void createBooking_whenInvalidBookingRequest_thenBadRequest() throws Exception {
+        BookingDtoReq invalidBooking = new BookingDtoReq();
+        invalidBooking.setStart(LocalDateTime.of(800, 1, 1, 12, 0, 0));
+        invalidBooking.setEnd(LocalDateTime.of(900, 1, 1, 12, 0, 0));
+
+        mockMvc.perform(post("/bookings")
+                        .content(objectMapper.writeValueAsString(invalidBooking))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HEADER, "1"))
+                .andExpect(status().isBadRequest());
     }
 }
