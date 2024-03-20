@@ -168,7 +168,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Booking findLastBooking(long itemId) {
-        List<Booking> itemBookings = bookingRepository.findAllByItem_Id(itemId);
+        List<Booking> itemBookings = findAllBookingsForItems(Collections.singletonList(itemId));
 
         return itemBookings.stream()
                 .filter(booking -> booking.getStart().isBefore(LocalDateTime.now()))
@@ -178,12 +178,16 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Booking findNextBooking(long itemId) {
-        List<Booking> itemBookings = bookingRepository.findAllByItem_Id(itemId);
+        List<Booking> itemBookings = findAllBookingsForItems(Collections.singletonList(itemId));
 
         return itemBookings.stream()
                 .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
                 .filter(booking -> booking.getStatus() == Status.APPROVED)
                 .min(Comparator.comparing(Booking::getStart))
                 .orElse(null);
+    }
+
+    private List<Booking> findAllBookingsForItems(List<Long> itemIds) {
+        return bookingRepository.findAllByItemIdIn(itemIds);
     }
 }

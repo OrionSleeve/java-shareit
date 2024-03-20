@@ -10,7 +10,7 @@ import ru.practicum.shareit.booking.model.enums.Status;
 import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    List<Booking> findAllByBookerIdOrderByStartDesc(long bookerId, Pageable pageable);
+    List<Booking> findAllByBookerId(long bookerId, Pageable pageable);
 
     List<Booking> findAllByBookerIdAndStatus(long bookerId, Status status, Pageable pageable);
 
@@ -75,5 +75,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "ORDER BY b.start DESC")
     List<Booking> findAllByBookerIdAndItemIdPast(long bookerId, long itemId);
 
-    List<Booking> findAllByItem_Id(long itemId);
+    List<Booking> findAllByItemIdIn(List<Long> ids);
 }

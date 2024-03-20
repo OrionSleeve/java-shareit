@@ -98,7 +98,7 @@ class BookingJpaTest {
     @SneakyThrows
     void findAllByBookerIdOrderByStartDesc() {
         List<Booking> actual = bookingRepository
-                .findAllByBookerIdOrderByStartDesc(bookerId, PAGE);
+                .findAllByBookerId(bookerId, PAGE);
         List<Booking> expect = new ArrayList<>();
         expect.add(bookingRepository.findById(bookingId1).get());
         expect.add(bookingRepository.findById(bookingId2).get());

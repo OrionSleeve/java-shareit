@@ -250,7 +250,7 @@ class BookingServiceImplTest {
         booking3.setStatus(Status.WAITING);
 
         when(userRepository.findById(bookerId)).thenReturn(Optional.of(booker));
-        when(bookingRepository.findAllByBookerIdOrderByStartDesc(bookerId, page))
+        when(bookingRepository.findAllByBookerId(bookerId, page))
                 .thenReturn(List.of(booking1, booking2, booking3));
         when(bookingRepository.findAllByBookerIdCurrent(bookerId, page))
                 .thenReturn(List.of(booking1, booking2, booking3));
