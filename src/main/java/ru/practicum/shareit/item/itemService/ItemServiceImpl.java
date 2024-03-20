@@ -76,11 +76,12 @@ public class ItemServiceImpl implements ItemService {
         List<Item> items = itemRepository.findAllByOwnerId(ownerId, Paginator.createSimplePageRequest(from, size));
         List<Long> itemIds = extractItemIds(items);
         List<ItemDto> itemDtoList = getItemsWithCommentsForItemIds(items, itemIds);
-        List<Booking> allBookingsForItems = findAllBookingsForItems(itemIds);
+        Map<Long, List<Booking>> bookingsMap = findAllBookingsForItems(itemIds);
 
         for (ItemDto i : itemDtoList) {
-            BookingDto nextBooking = BookingMapper.maptoBookingDtoForOwner(findNextBooking(allBookingsForItems, i.getId()));
-            BookingDto lastBooking = BookingMapper.maptoBookingDtoForOwner(findLastBooking(allBookingsForItems, i.getId()));
+            List<Booking> bookingsForItem = bookingsMap.get(i.getId());
+            BookingDto nextBooking = BookingMapper.maptoBookingDtoForOwner(findNextBooking(bookingsForItem));
+            BookingDto lastBooking = BookingMapper.maptoBookingDtoForOwner(findLastBooking(bookingsForItem));
             i.setNextBooking(nextBooking);
             i.setLastBooking(lastBooking);
         }
@@ -168,9 +169,8 @@ public class ItemServiceImpl implements ItemService {
         return itemDtoList;
     }
 
-    private Booking findLastBooking(List<Booking> allBookingsForItems, long itemId) {
+    private Booking findLastBooking(List<Booking> allBookingsForItems) {
         Optional<Booking> lastBooking = allBookingsForItems.stream()
-                .filter(booking -> booking.getItem().getId() == itemId)
                 .filter(booking -> booking.getStart().isBefore(LocalDateTime.now()))
                 .filter(booking -> booking.getStatus() == Status.APPROVED)
                 .max(Comparator.comparing(Booking::getEnd));
@@ -178,9 +178,8 @@ public class ItemServiceImpl implements ItemService {
         return lastBooking.orElse(null);
     }
 
-    private Booking findNextBooking(List<Booking> allBookingsForItems, long itemId) {
+    private Booking findNextBooking(List<Booking> allBookingsForItems) {
         Optional<Booking> nextBooking = allBookingsForItems.stream()
-                .filter(booking -> booking.getItem().getId() == itemId)
                 .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
                 .filter(booking -> booking.getStatus() == Status.APPROVED)
                 .min(Comparator.comparing(Booking::getStart));
@@ -188,7 +187,17 @@ public class ItemServiceImpl implements ItemService {
         return nextBooking.orElse(null);
     }
 
-    private List<Booking> findAllBookingsForItems(List<Long> itemIds) {
-        return bookingRepository.findAllByItemIdIn(itemIds);
+    private Map<Long, List<Booking>> findAllBookingsForItems(List<Long> itemIds) {
+        Map<Long, List<Booking>> bookingsMap = new HashMap<>();
+        List<Booking> allBookings = bookingRepository.findAllByItemIdIn(itemIds);
+
+        for (Long itemId : itemIds) {
+            List<Booking> bookingsForItem = allBookings.stream()
+                    .filter(booking -> booking.getItem().getId() == itemId)
+                    .collect(Collectors.toList());
+            bookingsMap.put(itemId, bookingsForItem);
+        }
+
+        return bookingsMap;
     }
 }
