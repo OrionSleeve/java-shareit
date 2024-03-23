@@ -7,13 +7,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.GroupsInterface;
 import ru.practicum.shareit.item.dto.CommentReqDto;
-import ru.practicum.shareit.item.dto.CommentResDto;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoCreate;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import java.util.List;
 
 import static ru.practicum.shareit.Constants.HEADER;
 
@@ -34,31 +31,31 @@ public class ItemController {
 
     @GetMapping("/{itemId}")
     public ResponseEntity<Object> getItemById(@PathVariable long itemId,
-                               @RequestHeader(HEADER) long ownerId) {
+                                              @RequestHeader(HEADER) long ownerId) {
         log.info("Fetching item by ID {}", itemId);
         return itemClient.getItemById(itemId, ownerId);
     }
 
     @GetMapping
     public ResponseEntity<Object> getItemByOwner(@RequestHeader(HEADER) long ownerId,
-                                        @RequestParam(name = "from", defaultValue = "0") @Min(0) int from,
-                                        @RequestParam(name = "size", defaultValue = "10") @Min(0) int size) {
+                                                 @RequestParam(name = "from", defaultValue = "0") @Min(0) int from,
+                                                 @RequestParam(name = "size", defaultValue = "10") @Min(0) int size) {
         log.info("Fetching items by owner ID {}", ownerId);
         return itemClient.getItemsByOwner(ownerId, from, size);
     }
 
     @PatchMapping("/{itemId}")
     public ResponseEntity<Object> updateItem(@PathVariable long itemId,
-                              @RequestHeader(HEADER) long ownerId,
-                              @Validated(GroupsInterface.Update.class) @RequestBody ItemDtoCreate itemDto) {
+                                             @RequestHeader(HEADER) long ownerId,
+                                             @Validated(GroupsInterface.Update.class) @RequestBody ItemDtoCreate itemDto) {
         log.info("Updating item with ID {} by owner ID {}", itemId, ownerId);
         return itemClient.updateItemData(itemId, ownerId, itemDto);
     }
 
     @GetMapping("/search")
     public ResponseEntity<Object> searchItems(@RequestParam String text,
-                                     @RequestParam(name = "from", defaultValue = "0") @Min(0) int from,
-                                     @RequestParam(name = "size", defaultValue = "10") @Min(0) int size) {
+                                              @RequestParam(name = "from", defaultValue = "0") @Min(0) int from,
+                                              @RequestParam(name = "size", defaultValue = "10") @Min(0) int size) {
         log.info("Searching items with text: {}", text);
         return itemClient.searchItems(text.toLowerCase(), from, size);
     }
