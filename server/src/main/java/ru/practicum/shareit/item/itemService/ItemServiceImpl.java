@@ -129,7 +129,7 @@ public class ItemServiceImpl implements ItemService {
                         + " for item " + itemId + " doesn't exist"));
 
         Comment comment = CommentMapper.fromCommentRequestDto(commentRequestDto);
-        LocalDateTime dateTime = LocalDateTime.now().plusMinutes(1);
+        LocalDateTime dateTime = LocalDateTime.now();
         comment.setCreated(dateTime);
         if (booking.getEnd().isAfter(comment.getCreated())) {
             throw new InvalidRequestException("Comment field created must be after booking end");
