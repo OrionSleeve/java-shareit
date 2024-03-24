@@ -72,13 +72,13 @@ public class BookingDtoJsonTest {
                 .findFirst()
                 .orElse(null);
         assertNotNull(startViolation);
-        assertEquals("must not be null", startViolation.getMessage());
+        assertEquals("не должно равняться null", startViolation.getMessage());
 
         ConstraintViolation<BookingDtoReq> endViolation = violations.stream()
                 .filter(v -> v.getPropertyPath().toString().equals("end"))
                 .findFirst()
                 .orElse(null);
         assertNotNull(endViolation);
-        assertEquals("must not be null", endViolation.getMessage());
+        assertEquals("не должно равняться null", endViolation.getMessage());
     }
 }

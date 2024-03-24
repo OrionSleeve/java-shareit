@@ -18,12 +18,14 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.pagination.Paginator;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -155,7 +158,7 @@ class ItemServiceTest {
         item.setOwner(user);
 
 
-        List<ItemDto> expectItemDto = itemService.getItemsByOwner(userId,from,size);
+        List<ItemDto> expectItemDto = itemService.getItemsByOwner(userId, from, size);
         List<ItemDto> actualItemDto = itemService.getItemsByOwner(userId, from, size);
         assertEquals(expectItemDto, actualItemDto);
     }
@@ -291,5 +294,95 @@ class ItemServiceTest {
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
 
         assertThrows(InvalidRequestException.class, () -> itemService.addComment(commentRequestDto, userId, itemId));
+    }
+
+    @Test
+    void getItemById_whenItemNotFound_thenThrowNotFoundException() {
+        long itemId = 1L;
+        long userId = 1L;
+
+        when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> itemService.getItemById(itemId, userId));
+    }
+
+    @Test
+    void getItemsByOwnerId_whenNoItemsFound_thenReturnEmptyList() {
+        long userId = 1L;
+        int from = 0;
+        int size = 10;
+
+        when(itemRepository.findAllByOwnerId(userId, PageRequest.of(from, size))).thenReturn(Collections.emptyList());
+
+        List<ItemDto> result = itemService.getItemsByOwner(userId, from, size);
+
+        assertEquals(Collections.emptyList(), result);
+    }
+
+    @Test
+    void addComment_whenUserNotFound_thenThrowNotFoundException() {
+        long userId = 1L;
+        long itemId = 1L;
+        CommentReqDto commentRequestDto = new CommentReqDto();
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> itemService.addComment(commentRequestDto, userId, itemId));
+    }
+
+    @Test
+    void addComment_whenItemNotFound_thenThrowNotFoundException() {
+        long userId = 1L;
+        long itemId = 1L;
+        CommentReqDto commentRequestDto = new CommentReqDto();
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(new User()));
+        when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> itemService.addComment(commentRequestDto, userId, itemId));
+    }
+
+    @Test
+    void createItem_whenUserIdCorrectButItemSaveFails_thenThrowException() {
+        User user = new User();
+        long userId = 1L;
+        user.setId(userId);
+
+        ItemDtoCreate itemDto = ItemDtoCreate.builder().build();
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(itemRepository.save(any())).thenThrow(new RuntimeException("Failed to save item"));
+
+        assertThrows(RuntimeException.class, () -> itemService.createItem(userId, itemDto));
+    }
+
+    @Test
+    void getItemsByOwner_whenValidOwnerId_thenReturnItemList() {
+        // Arrange
+        long ownerId = 1L;
+        int from = 0;
+        int size = 10;
+
+        User owner = new User();
+        owner.setId(ownerId);
+
+        Item item1 = new Item();
+        item1.setId(1L);
+        item1.setOwner(owner);
+
+        Item item2 = new Item();
+        item2.setId(2L);
+        item2.setOwner(owner);
+
+        when(itemRepository.findAllByOwnerId(ownerId, Paginator.createSimplePageRequest(from, size)))
+                .thenReturn(Arrays.asList(item1, item2));
+
+        lenient().when(commentRepository.findAllByItemId(anyLong())).thenReturn(Collections.emptyList());
+        lenient().when(bookingRepository.findNextClosestBookingByOwnerId(anyLong(), anyLong())).thenReturn(Collections.emptyList());
+        lenient().when(bookingRepository.findLastClosestBookingByOwnerId(anyLong(), anyLong())).thenReturn(Collections.emptyList());
+
+        List<ItemDto> result = itemService.getItemsByOwner(ownerId, from, size);
+
+        assertEquals(2, result.size());
     }
 }

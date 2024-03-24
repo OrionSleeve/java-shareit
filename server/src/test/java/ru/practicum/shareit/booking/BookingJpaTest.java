@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.booking.bookingRepository.BookingRepository;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.enums.Status;
 import ru.practicum.shareit.item.model.Item;
@@ -36,6 +37,7 @@ class BookingJpaTest {
 
     private long bookerId;
     private long ownerId;
+    private long itemId;
 
     private static final int FROM = 0;
     private static final int SIZE = 10;
@@ -62,7 +64,7 @@ class BookingJpaTest {
         item.setAvailable(true);
         item.setOwner(owner);
         item = itemRepository.save(item);
-        long itemId = item.getId();
+        itemId = item.getId();
 
         Booking booking1 = new Booking();
         booking1.setItem(item);
@@ -176,6 +178,15 @@ class BookingJpaTest {
         expect.add(bookingRepository.findById(bookingId2).get());
         expect.add(bookingRepository.findById(bookingId3).get());
         assertEquals(expect, actual);
+    }
+
+    @Test
+    @SneakyThrows
+    void findLastClosestBookingByOwnerId() {
+        List<BookingDto> last = bookingRepository
+                .findLastClosestBookingByOwnerId(ownerId, itemId);
+
+        assertEquals(last.size(), 0);
     }
 
     @AfterEach
