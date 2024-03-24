@@ -23,7 +23,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.util.List;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
@@ -68,6 +68,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookingDtoResp getBookingById(long userId, long bookingId) {
         checkUser(userId);
         Booking booking = checkBooking(bookingId);

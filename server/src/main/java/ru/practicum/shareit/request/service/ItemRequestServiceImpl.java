@@ -46,6 +46,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemRequestDto> getItemRequestsForUser(long userId) {
         checkUser(userId);
         List<ItemRequest> itemRequests = itemRequestRepository
@@ -60,6 +61,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemRequestDto> getItemRequestsFromOtherUsers(long userId, int from, int size) {
         Pageable page = PageRequest.of(from / size, size, Sort.by("created").descending());
         List<ItemRequest> itemRequests = itemRequestRepository
@@ -74,6 +76,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
+    @Transactional
     public ItemRequestDto getItemRequestById(long userId, long requestId) {
         checkUser(userId);
         checkItemRequest(requestId);

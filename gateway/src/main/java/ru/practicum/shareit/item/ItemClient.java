@@ -48,7 +48,7 @@ public class ItemClient extends BaseClient {
         return patch("/" + itemId, ownerId, itemDto);
     }
 
-    public ResponseEntity<Object> searchItems(String text, Integer from, Integer size) {
+    public ResponseEntity<Object> searchItems(String text, int from, int size) {
         Map<String, Object> parameters = Map.of(
                 "text", text,
                 "from", from,

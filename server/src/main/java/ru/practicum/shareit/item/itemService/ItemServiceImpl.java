@@ -50,6 +50,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemDto getItemById(long itemId, long ownerId) {
         Item item = checkItem(itemId);
         ItemDto itemDto = ItemMapper.toItemDto(item);
@@ -71,7 +72,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<ItemDto> getItemsByOwner(long ownerId, int from, int size) {
         List<Item> items = itemRepository.findAllByOwnerId(ownerId, Paginator.createSimplePageRequest(from, size));
         List<Long> itemIds = extractItemIds(items);

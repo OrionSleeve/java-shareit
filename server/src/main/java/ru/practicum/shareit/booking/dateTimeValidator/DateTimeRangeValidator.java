@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking.dateTimeValidator;
 
-import ru.practicum.shareit.booking.dateTimeValidator.DateTimeRange;
 import ru.practicum.shareit.booking.dto.BookingDtoReq;
 
 import javax.validation.ConstraintValidator;
