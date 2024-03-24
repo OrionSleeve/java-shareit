@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.itemService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.bookingRepository.BookingRepository;
@@ -73,8 +74,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public List<ItemDto> getItemsByOwner(long ownerId, int from, int size) {
-        List<Item> items = itemRepository.findAllByOwnerId(ownerId, Paginator.createSimplePageRequest(from, size));
+    public List<ItemDto> getItemsByOwner(long ownerId, Integer from, Integer size) {
+        Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+        List<Item> items = itemRepository.findAllByOwnerId(ownerId, Paginator.createPageRequestWithSort(from, size, sortById));
         List<Long> itemIds = extractItemIds(items);
         List<ItemDto> itemDtoList = getItemsWithCommentsForItemIds(items, itemIds);
         Map<Long, List<Booking>> bookingsMap = findAllBookingsForItems(itemIds);
