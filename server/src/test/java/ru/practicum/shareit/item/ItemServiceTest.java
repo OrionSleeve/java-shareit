@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.booking.bookingRepository.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
@@ -308,11 +309,12 @@ class ItemServiceTest {
 
     @Test
     void getItemsByOwnerId_whenNoItemsFound_thenReturnEmptyList() {
+        Sort sortById = Sort.by(Sort.Direction.ASC, "id");
         long userId = 1L;
         int from = 0;
         int size = 10;
 
-        when(itemRepository.findAllByOwnerId(userId, PageRequest.of(from, size))).thenReturn(Collections.emptyList());
+        when(itemRepository.findAllByOwnerId(userId, Paginator.createPageRequestWithSort(from, size, sortById))).thenReturn(Collections.emptyList());
 
         List<ItemDto> result = itemService.getItemsByOwner(userId, from, size);
 
@@ -358,11 +360,10 @@ class ItemServiceTest {
 
     @Test
     void getItemsByOwner_whenValidOwnerId_thenReturnItemList() {
-        // Arrange
+        Sort sortById = Sort.by(Sort.Direction.ASC, "id");
         long ownerId = 1L;
         int from = 0;
         int size = 10;
-
         User owner = new User();
         owner.setId(ownerId);
 
@@ -374,7 +375,7 @@ class ItemServiceTest {
         item2.setId(2L);
         item2.setOwner(owner);
 
-        when(itemRepository.findAllByOwnerId(ownerId, Paginator.createSimplePageRequest(from, size)))
+        when(itemRepository.findAllByOwnerId(ownerId, Paginator.createPageRequestWithSort(from, size, sortById)))
                 .thenReturn(Arrays.asList(item1, item2));
 
         lenient().when(commentRepository.findAllByItemId(anyLong())).thenReturn(Collections.emptyList());
