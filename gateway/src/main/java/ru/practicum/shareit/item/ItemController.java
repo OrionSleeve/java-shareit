@@ -39,7 +39,7 @@ public class ItemController {
     @GetMapping
     public ResponseEntity<Object> getItemByOwner(@RequestHeader(HEADER) long ownerId,
                                                  @RequestParam(name = "from", defaultValue = "0") @Min(0) int from,
-                                                 @RequestParam(name = "size", defaultValue = "10") @Min(0) int size) {
+                                                 @RequestParam(name = "size", defaultValue = "10") @Min(1) int size) {
         log.info("Fetching items by owner ID {}", ownerId);
         return itemClient.getItemsByOwner(ownerId, from, size);
     }
