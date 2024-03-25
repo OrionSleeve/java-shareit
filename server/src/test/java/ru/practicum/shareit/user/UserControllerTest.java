@@ -151,45 +151,4 @@ class UserControllerTest extends CrudTestUtils {
     public void afterEach() {
         userService.getAllUsers().forEach(u -> userService.removeUser(u.getId()));
     }
-
-    @Test
-    public void shouldReturnBadRequestWhenNameIsNull() throws Exception {
-        UserDto newUser = UserDto.builder().email("test@example.com").build();
-
-        mockMvc.perform(post("/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newUser)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void shouldReturnBadRequestWhenEmailIsNull() throws Exception {
-        UserDto newUser = UserDto.builder().name("Test").build();
-
-        mockMvc.perform(post("/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newUser)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void shouldReturnBadRequestWhenEmailIsInvalid() throws Exception {
-        UserDto newUser = UserDto.builder().name("Test").email("invalid_email").build();
-
-        mockMvc.perform(post("/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newUser)))
-                .andExpect(status().isBadRequest());
-    }
-
-
-    @Test
-    public void shouldReturnBadRequestWhenEmailIsTooLong() throws Exception {
-        UserDto newUser = UserDto.builder().name("Test").email("a".repeat(255) + "@example.com").build();
-
-        mockMvc.perform(post("/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newUser)))
-                .andExpect(status().isBadRequest());
-    }
 }

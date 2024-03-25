@@ -8,9 +8,6 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,13 +18,6 @@ public class ItemDtoJsonTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    private final Validator validator;
-
-    public ItemDtoJsonTest() {
-        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-        this.validator = validatorFactory.getValidator();
-    }
 
     @Test
     public void testSerialize() throws Exception {
