@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.GroupsInterface;
@@ -11,12 +12,13 @@ import ru.practicum.shareit.item.dto.ItemDtoCreate;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.util.Collections;
 
 import static ru.practicum.shareit.Constants.HEADER;
 
 @Slf4j
 @Validated
-@RestController
+@Controller
 @RequiredArgsConstructor
 @RequestMapping("/items")
 public class ItemController {
@@ -56,6 +58,9 @@ public class ItemController {
     public ResponseEntity<Object> searchItems(@RequestParam String text,
                                               @RequestParam(name = "from", defaultValue = "0") @Min(0) int from,
                                               @RequestParam(name = "size", defaultValue = "10") @Min(0) int size) {
+        if (text.isBlank()) {
+            ResponseEntity.ok(Collections.emptyList());
+        }
         log.info("Searching items with text: {}", text);
         return itemClient.searchItems(text.toLowerCase(), from, size);
     }

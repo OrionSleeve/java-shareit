@@ -8,8 +8,6 @@ import ru.practicum.shareit.request.dto.ItemDescriptionRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import java.util.List;
 
 import static ru.practicum.shareit.Constants.HEADER;
@@ -25,7 +23,7 @@ public class ItemRequestController {
     @PostMapping
     public ItemRequestDto createItemRequest(
             @RequestHeader(HEADER) long userId,
-            @RequestBody @Valid ItemDescriptionRequestDto request) {
+            @RequestBody ItemDescriptionRequestDto request) {
         log.info("Creating new item request for user {}", userId);
         return itemRequestService.createNewRequestForItem(userId, request);
     }
@@ -39,8 +37,8 @@ public class ItemRequestController {
     @GetMapping("/all")
     public List<ItemRequestDto> getOtherUsersItemRequests(
             @RequestHeader(HEADER) long userId,
-            @RequestParam(name = "from", defaultValue = "0") @Min(0) int from,
-            @RequestParam(name = "size", defaultValue = "10") @Min(0) int size) {
+            @RequestParam(name = "from", defaultValue = "0") int from,
+            @RequestParam(name = "size", defaultValue = "10") int size) {
         log.info("Getting item requests from other users for user {}", userId);
         return itemRequestService.getItemRequestsFromOtherUsers(userId, from, size);
     }

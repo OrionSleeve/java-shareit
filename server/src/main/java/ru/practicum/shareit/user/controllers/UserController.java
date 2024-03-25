@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.GroupsInterface;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.userService.UserService;
 
@@ -19,7 +18,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public UserDto createUser(@RequestBody @Validated(GroupsInterface.Create.class) UserDto userDto) {
+    public UserDto createUser(@RequestBody UserDto userDto) {
         log.info("Received request to create user: {}", userDto);
         return userService.addNewUser(userDto);
     }
@@ -38,7 +37,7 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     public UserDto updateUser(@PathVariable long userId,
-                              @RequestBody @Validated(GroupsInterface.Update.class) UserDto userDto) {
+                              @RequestBody UserDto userDto) {
         log.info("Received request to update user with ID: {} with data: {}", userId, userDto);
         return userService.updateUserData(userId, userDto);
     }

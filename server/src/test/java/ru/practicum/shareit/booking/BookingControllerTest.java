@@ -17,15 +17,10 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.dto.UserDto;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -41,22 +36,6 @@ class BookingControllerTest extends CrudTestUtils {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
-
-    private static final Validator VALIDATOR;
-
-    static {
-        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-        VALIDATOR = validatorFactory.usingContext().getValidator();
-    }
-
-    @Test
-    public void testValidations() {
-        BookingDtoReq invalidBooking = new BookingDtoReq();
-        invalidBooking.setStart(LocalDateTime.of(800, 1, 1, 12, 0, 0));
-        invalidBooking.setEnd(LocalDateTime.of(900, 1, 1, 12, 0, 0));
-        Set<ConstraintViolation<BookingDtoReq>> validates = VALIDATOR.validate(invalidBooking);
-        assertTrue(validates.size() > 0);
-    }
 
     @Test
     void createBooking_whenBookingIdIncorrect_thenBookingNotFoundException() throws Exception {
@@ -560,18 +539,5 @@ class BookingControllerTest extends CrudTestUtils {
                         .param("size", String.valueOf(size))
                         .header(HEADER, String.valueOf(ownerId)))
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof InvalidRequestException));
-    }
-
-    @Test
-    void createBooking_whenInvalidBookingRequest_thenBadRequest() throws Exception {
-        BookingDtoReq invalidBooking = new BookingDtoReq();
-        invalidBooking.setStart(LocalDateTime.of(800, 1, 1, 12, 0, 0));
-        invalidBooking.setEnd(LocalDateTime.of(900, 1, 1, 12, 0, 0));
-
-        mockMvc.perform(post("/bookings")
-                        .content(objectMapper.writeValueAsString(invalidBooking))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HEADER, "1"))
-                .andExpect(status().isBadRequest());
     }
 }

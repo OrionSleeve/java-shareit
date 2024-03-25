@@ -219,32 +219,4 @@ class ItemControllerTest extends CrudTestUtils {
         assertEquals(commentResponseDto.getText(), commentRequestDto.getText());
         assertEquals(commentResponseDto.getAuthorName(), booking.getBooker().getName());
     }
-
-    @Test
-    public void shouldReturnBadRequestWhenCreatingItemWithEmptyName() throws Exception {
-        long ownerId = createUser(UserDto.builder().name("Mark").email("mark@email.com").build()).getId();
-
-        ItemDto request = ItemDto.builder().description("Description").available(true).build();
-
-        mockMvc.perform(post("/items")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                        .header(HEADER, String.valueOf(ownerId)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void shouldReturnBadRequestWhenCreatingItemWithEmptyDescription() throws Exception {
-        long ownerId = createUser(UserDto.builder().name("Mark").email("mark@email.com").build()).getId();
-
-        ItemDto request = ItemDto.builder().name("Item").available(true).build();
-
-        mockMvc.perform(post("/items")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                        .header(HEADER, String.valueOf(ownerId)))
-                .andExpect(status().isBadRequest());
-    }
-
-
 }

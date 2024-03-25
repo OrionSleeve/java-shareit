@@ -7,10 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import ru.practicum.shareit.request.dto.ItemDescriptionRequestDto;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @JsonTest
@@ -18,11 +14,6 @@ public class ItemRequestDescriptionTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    public ItemRequestDescriptionTest() {
-        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-        Validator validator = validatorFactory.getValidator();
-    }
 
     @Test
     @SneakyThrows
