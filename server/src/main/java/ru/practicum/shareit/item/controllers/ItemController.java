@@ -25,7 +25,7 @@ public class ItemController {
     @PostMapping
     public ItemDto createItem(@RequestHeader(HEADER) long ownerId,
                               @RequestBody ItemDtoCreate itemDto) {
-        log.info("Creating item with owner ID {}", ownerId);
+        log.info("Creating item with owner Id {}", ownerId);
         return itemService.createItem(ownerId, itemDto);
     }
 
