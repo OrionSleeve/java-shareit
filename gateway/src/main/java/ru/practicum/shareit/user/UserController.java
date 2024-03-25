@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.GroupsInterface;
 import ru.practicum.shareit.user.dto.UserDto;
 
+import javax.validation.constraints.Min;
+
 @Slf4j
 @Validated
 @Controller
@@ -36,7 +38,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public ResponseEntity<Object> updateUser(@PathVariable long userId,
+    public ResponseEntity<Object> updateUser(@PathVariable @Min(1) long userId,
                                              @RequestBody @Validated(GroupsInterface.Update.class) UserDto userDto) {
         log.info("Received request to update user with ID: {} with data: {}", userId, userDto);
         return userClient.updateUserData(userId, userDto);
