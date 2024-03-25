@@ -51,7 +51,7 @@ public class BookingController {
                                                     @RequestParam(name = "from", defaultValue = "0") @Min(0) int from,
                                                     @RequestParam(name = "size", defaultValue = "10") @Min(0) int size) {
         BookingState bookingState = BookingState.toState(state);
-        log.info("Fetched bookings successfully for user {} with state {}", userId, state);
+        log.info("Fetched bookings successfully for user {} with State {}", userId, state);
         return bookingClient.getBookingByBookerId(userId, bookingState, from, size);
     }
 
